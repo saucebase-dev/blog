@@ -1,12 +1,18 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(rtk find *)",
+      "Bash(rtk ls *)",
+      "Read(//Volumes/Work/dev/saucebase/saucebase/**)",
+      "Bash(vendor/bin/pint --dirty --format agent modules/Blog/database/seeders/BlogDatabaseSeeder.php)",
+      "Bash(php -d memory_limit=2048M artisan test --compact --testsuite=Modules --filter='^Modules\\\\\\\\Blog\\\\\\\\Tests')",
+      "Bash(rtk grep *)",
+      "Bash(rtk read *)"
+    ]
+  },
   "enabledMcpjsonServers": [
     "laravel-boost",
     "playwright",
     "shadcnVue"
-  ],
-  "permissions": {
-    "allow": [
-      "Bash(rtk find *)"
-    ]
-  }
+  ]
 }

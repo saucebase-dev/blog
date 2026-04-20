@@ -1,0 +1,12 @@
+{
+  "enabledMcpjsonServers": [
+    "laravel-boost",
+    "playwright",
+    "shadcnVue"
+  ],
+  "permissions": {
+    "allow": [
+      "Bash(rtk find *)"
+    ]
+  }
+}

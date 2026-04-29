@@ -12,6 +12,12 @@ tasks:
         cmd: npx playwright test --project="@blog*" {{.CLI_ARGS}}
         interactive: true
 
+    # ── Database ──────────────────────────────────────────────────
+
+    db:seed:
+        desc: Seed the Blog module database
+        cmd: php artisan modules:seed --module=blog
+
     # ── Code Generation ────────────────────────────────────────────
 
     types:generate:

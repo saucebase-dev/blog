@@ -33,7 +33,7 @@ defineProps<{
                 </div>
             </div>
 
-            <div class="flex flex-1 flex-col gap-3 pt-4 px-1 pb-2">
+            <div class="flex flex-1 flex-col gap-3 px-1 pt-4 pb-2">
                 <!-- Category badge -->
                 <div v-if="post.category">
                     <span

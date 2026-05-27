@@ -11,7 +11,9 @@ defineProps<{
     <section class="mx-auto w-full max-w-6xl px-6 py-24">
         <div class="mb-12 flex items-end justify-between">
             <div>
-                <h2 class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white">
+                <h2
+                    class="text-4xl font-bold tracking-tight text-gray-900 dark:text-white"
+                >
                     {{ $t('From the blog') }}
                 </h2>
                 <p class="mt-2 text-lg text-gray-500 dark:text-gray-400">

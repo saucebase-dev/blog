@@ -41,8 +41,8 @@ class BlogDatabaseSeeder extends Seeder
         ]);
 
         $this->createPost([
-            'title' => 'The VILT Stack: Laravel, Vue, Inertia, and Tailwind Done Right',
-            'excerpt' => "Modern web dev has a tension between server productivity and rich interactivity. The VILT stack resolves it — and Saucebase wires all four pieces together so you don't have to.",
+            'title' => 'The Modern Laravel Stack: Inertia.js, Vue 3 or React, and Tailwind Done Right',
+            'excerpt' => "Modern web dev has a tension between server productivity and rich interactivity. Laravel, Inertia.js, and Tailwind resolve it — and Saucebase wires all the pieces together so you don't have to.",
             'content' => $content('post-3-vilt-stack.html'),
             'status' => PostStatus::Published,
             'published_at' => now()->subMonths(3),

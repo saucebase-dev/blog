@@ -44,7 +44,11 @@ defineProps<{
                     v-else
                     class="grid grid-cols-1 gap-8 sm:grid-cols-1 lg:grid-cols-2"
                 >
-                    <PostCard v-for="post in posts.data" :key="post.id" :post="post" />
+                    <PostCard
+                        v-for="post in posts.data"
+                        :key="post.id"
+                        :post="post"
+                    />
                 </div>
 
                 <!-- Pagination -->
@@ -55,14 +59,14 @@ defineProps<{
                     <Link
                         v-if="posts.prev_page_url"
                         :href="posts.prev_page_url"
-                        class="mt-8 cursor-pointer rounded-xl px-4 py-3 font-semibold shadow-lg transition-all duration-200 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 text-gray-900 ring-1 ring-gray-200 ring-inset hover:ring-gray-300 dark:bg-white/10 dark:text-white dark:ring-white/10 dark:hover:bg-white/20"
+                        class="mt-8 cursor-pointer rounded-xl px-4 py-3 font-semibold text-gray-900 shadow-lg ring-1 ring-gray-200 transition-all duration-200 ring-inset hover:ring-gray-300 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-white/10 dark:text-white dark:ring-white/10 dark:hover:bg-white/20"
                     >
                         {{ $t('← Previous') }}
                     </Link>
                     <Link
                         v-if="posts.next_page_url"
                         :href="posts.next_page_url"
-                        class="mt-8 cursor-pointer rounded-xl px-4 py-3 font-semibold shadow-lg transition-all duration-200 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 text-gray-900 ring-1 ring-gray-200 ring-inset hover:ring-gray-300 dark:bg-white/10 dark:text-white dark:ring-white/10 dark:hover:bg-white/20"
+                        class="mt-8 cursor-pointer rounded-xl px-4 py-3 font-semibold text-gray-900 shadow-lg ring-1 ring-gray-200 transition-all duration-200 ring-inset hover:ring-gray-300 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 dark:bg-white/10 dark:text-white dark:ring-white/10 dark:hover:bg-white/20"
                     >
                         {{ $t('Next →') }}
                     </Link>

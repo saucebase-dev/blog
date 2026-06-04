@@ -1,7 +1,9 @@
 {
     "name": "saucebase/blog",
-    "description": "",
+    "description": "Blog module",
     "type": "saucebase-module",
+    "license": "proprietary",
+    "version": "0.1.0",
     "authors": [
         {
             "name": "Saucebase",
@@ -10,13 +12,15 @@
     ],
     "extra": {
         "laravel": {
-            "providers": [],
+            "providers": [
+                "Modules\\Blog\\Providers\\BlogServiceProvider"
+            ],
             "aliases": {}
         }
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Blog\\": "app/",
+            "Modules\\Blog\\": "src/",
             "Modules\\Blog\\Database\\Factories\\": "database/factories/",
             "Modules\\Blog\\Database\\Seeders\\": "database/seeders/"
         }
@@ -25,5 +29,6 @@
         "psr-4": {
             "Modules\\Blog\\Tests\\": "tests/"
         }
-    }
+    },
+    "minimum-stability": "stable"
 }

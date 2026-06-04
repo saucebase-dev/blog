@@ -33,10 +33,22 @@ const jsonLd = computed(() => ({
         type="article"
     >
         <Head>
-            <meta v-if="post.published_at" property="article:published_time" :content="post.published_at" />
-            <meta v-if="post.author" property="article:author" :content="post.author.name" />
+            <meta
+                v-if="post.published_at"
+                property="article:published_time"
+                :content="post.published_at"
+            />
+            <meta
+                v-if="post.author"
+                property="article:author"
+                :content="post.author.name"
+            />
             <!-- eslint-disable-next-line vue/no-v-text-v-html-on-component -->
-            <component :is="'script'" type="application/ld+json" v-html="JSON.stringify(jsonLd)" />
+            <component
+                :is="'script'"
+                type="application/ld+json"
+                v-html="JSON.stringify(jsonLd)"
+            />
         </Head>
         <main class="mx-auto w-full max-w-3xl flex-1 px-6 py-28">
             <!-- Back link -->
@@ -57,7 +69,10 @@ const jsonLd = computed(() => ({
 
             <!-- Meta: author + date -->
             <div class="mb-10">
-                <PostMeta :author="post.author" :published-at="post.published_at" />
+                <PostMeta
+                    :author="post.author"
+                    :published-at="post.published_at"
+                />
             </div>
 
             <!-- Cover image -->
@@ -82,15 +97,21 @@ const jsonLd = computed(() => ({
 
         <!-- You might also like -->
         <section v-if="related.length > 0">
-            <div class="mx-auto w-full max-w-6xl px-6 py-8 mb-16">
+            <div class="mx-auto mb-16 w-full max-w-6xl px-6 py-8">
                 <h2
                     class="mb-10 text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
                 >
                     {{ $t('You might also like') }}
                 </h2>
 
-                <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                    <PostCard v-for="item in related" :key="item.id" :post="item" />
+                <div
+                    class="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3"
+                >
+                    <PostCard
+                        v-for="item in related"
+                        :key="item.id"
+                        :post="item"
+                    />
                 </div>
             </div>
         </section>

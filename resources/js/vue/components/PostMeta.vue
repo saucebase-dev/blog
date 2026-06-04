@@ -23,13 +23,17 @@ function formatDate(dateStr: string): string {
         />
         <div
             v-else-if="author"
-            class="flex h-6 w-6 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary"
+            class="bg-primary/20 text-primary flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold"
         >
             {{ author.name.charAt(0).toUpperCase() }}
         </div>
         <div class="flex items-center gap-3 text-sm">
-            <span v-if="author" class="font-semibold text-foreground">{{ author.name }}</span>
-            <time v-if="publishedAt" class="text-muted-foreground">{{ formatDate(publishedAt) }}</time>
+            <span v-if="author" class="text-foreground font-semibold">{{
+                author.name
+            }}</span>
+            <time v-if="publishedAt" class="text-muted-foreground">{{
+                formatDate(publishedAt)
+            }}</time>
         </div>
     </div>
 </template>

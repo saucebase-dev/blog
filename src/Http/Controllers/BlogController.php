@@ -30,7 +30,7 @@ class BlogController
             $category = Category::where('slug', $categoryOrSlug)->firstOrFail();
             $post = $query->where('category_id', $category->id)->where('slug', $slug)->firstOrFail();
         } else {
-            $post = $query->where('slug', $categoryOrSlug)->whereNull('category_id')->firstOrFail();
+            $post = $query->where('slug', $categoryOrSlug)->firstOrFail();
         }
 
         $related = Post::published()

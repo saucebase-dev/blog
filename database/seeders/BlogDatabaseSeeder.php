@@ -28,7 +28,7 @@ class BlogDatabaseSeeder extends Seeder
             'published_at' => now()->subMonths(5),
             'category_id' => $gettingStarted->id,
             'author_id' => $author?->id,
-        ], public_path('images/blog/what-is-saucebase.jpg'));
+        ], public_path('modules/blog/images/what-is-saucebase.jpg'));
 
         $this->createPost([
             'title' => 'Stop Rebuilding the Same Boilerplate Every Project',
@@ -48,7 +48,7 @@ class BlogDatabaseSeeder extends Seeder
             'published_at' => now()->subMonths(3),
             'category_id' => $devExperience->id,
             'author_id' => $author?->id,
-        ], public_path('images/blog/tech-stack.jpg'));
+        ], public_path('modules/blog/images/tech-stack.jpg'));
 
         $this->createPost([
             'title' => 'Your First Module: Scaffold and Ship in Under 10 Minutes',
@@ -58,7 +58,7 @@ class BlogDatabaseSeeder extends Seeder
             'published_at' => now()->subMonths(2),
             'category_id' => $featuresModules->id,
             'author_id' => $author?->id,
-        ], public_path('images/blog/add-your-saucebase.jpg'));
+        ], public_path('modules/blog/images/add-your-saucebase.jpg'));
 
         $this->createPost([
             'title' => 'Auth, Billing, and Privacy: The Three Modules Every SaaS Needs',
@@ -68,7 +68,7 @@ class BlogDatabaseSeeder extends Seeder
             'published_at' => now()->subMonth(),
             'category_id' => $featuresModules->id,
             'author_id' => $author?->id,
-        ], public_path('images/blog/cookies-or-privacy.jpg'));
+        ], public_path('modules/blog/images/cookies-or-privacy.jpg'));
 
         $this->createPost([
             'title' => 'Copy-and-Own: The Philosophy Behind Saucebase Modules',
@@ -78,7 +78,17 @@ class BlogDatabaseSeeder extends Seeder
             'published_at' => now()->subWeeks(2),
             'category_id' => $devExperience->id,
             'author_id' => $author?->id,
-        ], public_path('images/blog/your-recipes.jpg'));
+        ], public_path('modules/blog/images/your-recipes.jpg'));
+
+        $this->createPost([
+            'title' => 'Vue or React? What about both!',
+            'excerpt' => 'Choosing a frontend framework used to mean committing to a stack for the life of your project. Saucebase 2.0 changes that — ship with Vue 3 or React 19, and every module works either way.',
+            'content' => $content('post-7-vue-and-react.html'),
+            'status' => PostStatus::Published,
+            'published_at' => now()->subDays(3),
+            'category_id' => $devExperience->id,
+            'author_id' => $author?->id,
+        ], public_path('modules/blog/images/vue-and-react.jpg'));
     }
 
     private function createPost(array $data, string $coverImage = ''): Post

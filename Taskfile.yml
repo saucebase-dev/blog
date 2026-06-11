@@ -16,10 +16,10 @@ tasks:
 
     db:seed:
         desc: Seed the Blog module database
-        cmd: php artisan modules:seed --module=blog
+        cmd: '{{.APP}} php artisan modules:seed --module=blog'
 
     # ── Code Generation ────────────────────────────────────────────
 
     types:generate:
         desc: Generate TypeScript types from PHP DTOs and enums
-        cmd: php artisan module:generate-types blog
+        cmd: '{{.APP}} php artisan module:generate-types blog'

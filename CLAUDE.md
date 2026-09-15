@@ -2,10 +2,9 @@
 
 ## Overview
 
-Full-featured blog with posts, categories, cover images, author attribution, and SEO metadata. Public-facing pages are SSR-enabled. Filament admin at `/admin` → Blog section.
+Full-featured blog with posts, categories, cover images, author attribution, and SEO metadata. Public pages are SSR-enabled (`->withSSR()`). Filament admin at `/admin` → Blog section.
 
-- **Composer alias:** `blog`
-- **Enabled by default:** yes
+Supports Vue and React: `resources/js/vue/` and `resources/js/react/` mirror each other. Change both.
 
 ---
 
@@ -19,34 +18,25 @@ Full-featured blog with posts, categories, cover images, author attribution, and
 
 Two routes resolve a post — with and without category prefix:
 - `/blog/{slug}` → `blog.show`
-- `/blog/{category}/{slug}` → `blog.show.category`
+- `/blog/{category}/{slug}` → `blog.show.category` (404 when the post is not in that category)
 
-`BlogController::show()` accepts both and resolves the post by slug alone regardless of which route matched.
+`PostData::url` always points at the category route when the post has one, and the Show page uses it as the canonical URL.
 
-### PHP → TypeScript Serialization Contract
+### Post Content Is Sanitized on Output
 
-`BlogController::serializePost()` is the contract between backend and frontend. Both sides must stay in sync when fields change. Shape:
+The rich-editor HTML is rendered with `v-html` / `dangerouslySetInnerHTML`. `BlogController::show()` passes it through `Str::sanitizeHtml()` (Filament's Symfony sanitizer) first, so scripts and event handlers never reach the page. Keep that call if the controller changes.
 
-```php
-[
-    'id'           => int,
-    'title'        => string,
-    'slug'         => string,
-    'excerpt'      => string|null,
-    'cover_url'    => string,          // getFirstMediaUrl('cover')
-    'published_at' => string|null,     // ->toDateString() e.g. "2025-04-19"
-    'category'     => ['name' => string, 'slug' => string] | null,
-    'author'       => ['name' => string, 'avatar_url' => string] | null,
-    'url'          => string,          // route('blog.show') or route('blog.show.category')
-]
-```
+The JSON-LD `<script>` escapes `<` as `<` so a title containing `</script>` cannot break out of it.
 
-`Show` page additionally receives `'content' => string` (full HTML).
+### PHP → TypeScript Contract
 
-When adding a field visible on the frontend, update **all three** in sync:
-1. Migration + model `$fillable`
-2. `serializePost()` output array
-3. `resources/js/types/index.ts` `Post` interface
+`Modules\Blog\Data\PostData` (spatie/laravel-data, `#[TypeScript]`) is the contract with the frontend; its types generate into `resources/js/types/generated.d.ts`. `content` is only set on the Show page via `withContent()`.
+
+When adding a frontend field: migration + model `$fillable`, then `PostData`, then regenerate types.
+
+### Dates
+
+`published_at` is sent as a date string (`2025-04-19`). `PostMeta` formats it with `timeZone: 'UTC'` so it shows the same day on the server render and in every browser time zone.
 
 ---
 
@@ -54,19 +44,8 @@ When adding a field visible on the frontend, update **all three** in sync:
 
 ```bash
 # PHPUnit — this module only
-php -d memory_limit=2048M artisan test --testsuite=Modules --filter='^Modules\\Blog\\Tests'
+php -d memory_limit=2048M artisan test --compact modules/blog/tests
 
 # E2E
 npx playwright test --project="@blog*"
 ```
-
----
-
-## Known Issues
-
-| Issue | Location | Fix |
-|-------|----------|-----|
-| Workflow name is "Announcements Module Tests" | `.github/workflows/test.yml` line 1 | Change to `Blog Module Tests` |
-| Workflow `module:` is `Announcements` | `.github/workflows/test.yml` line 16 | Change to `Blog` |
-| E2E test selects `[data-testid^="post-link-"]` | `tests/e2e/blog.spec.ts` | Testid removed — update to use `post-card-{id}` click |
-| Several pt_BR keys untranslated | `lang/pt_BR.json` | `"From the blog"`, `"View all"`, `"Next →"` |

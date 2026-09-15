@@ -21,11 +21,9 @@ class EditPost extends EditRecord
                 ->color('gray')
                 ->url(function (): string {
                     /** @var Post $post */
-                    $post = $this->getRecord()->load('category');
+                    $post = $this->getRecord();
 
-                    return $post->category
-                        ? route('blog.show.category', [$post->category->slug, $post->slug])
-                        : route('blog.show', $post->slug);
+                    return $post->url();
                 })
                 ->openUrlInNewTab(),
             DeleteAction::make(),

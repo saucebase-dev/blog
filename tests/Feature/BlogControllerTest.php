@@ -4,6 +4,7 @@ namespace Modules\Blog\Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
 use Tests\TestCase;
@@ -23,6 +24,55 @@ class BlogControllerTest extends TestCase
                 ->where('posts.data.0.id', $published->id)
                 ->where('posts.data', fn ($posts) => count($posts) === 1)
             );
+    }
+
+    public function test_scheduled_post_is_hidden_until_its_publish_date(): void
+    {
+        $post = Post::factory()->create(['published_at' => now()->addDay()]);
+
+        $this->get(route('blog.index'))
+            ->assertInertia(fn ($page) => $page->has('posts.data', 0));
+        $this->get(route('blog.show', $post->slug))->assertNotFound();
+    }
+
+    public function test_publishing_without_a_date_stamps_the_publish_date(): void
+    {
+        $post = Post::factory()->draft()->create();
+
+        $post->update(['status' => PostStatus::Published]);
+
+        $this->assertNotNull($post->fresh()->published_at);
+    }
+
+    public function test_related_posts_prefer_the_same_category_and_exclude_the_current_post(): void
+    {
+        $category = Category::factory()->create();
+        $post = Post::factory()->published()->create(['category_id' => $category->id]);
+        $sameCategory = Post::factory()->create([
+            'category_id' => $category->id,
+            'published_at' => now()->subYear(),
+        ]);
+        Post::factory(3)->create(['category_id' => null, 'published_at' => now()->subHour()]);
+
+        $this->get(route('blog.show.category', [$category->slug, $post->slug]))
+            ->assertInertia(fn ($page) => $page
+                ->has('related', 3)
+                ->where('related.0.id', $sameCategory->id)
+                ->where('related', fn ($related) => collect($related)->doesntContain('id', $post->id))
+            );
+    }
+
+    public function test_sitemap_lists_the_blog_and_only_published_posts(): void
+    {
+        $category = Category::factory()->create();
+        $published = Post::factory()->published()->create(['category_id' => $category->id]);
+        $draft = Post::factory()->draft()->create();
+
+        $this->get(route('sitemap'))
+            ->assertOk()
+            ->assertSee('<loc>'.route('blog.index').'</loc>', false)
+            ->assertSee('<loc>'.route('blog.show.category', [$category->slug, $published->slug]).'</loc>', false)
+            ->assertDontSee($draft->slug);
     }
 
     public function test_index_returns_paginated_response(): void
@@ -83,6 +133,21 @@ class BlogControllerTest extends TestCase
 
         $this->get(route('blog.show.category', [$wrongCategory->slug, $post->slug]))
             ->assertNotFound();
+    }
+
+    public function test_show_strips_scripts_from_post_content(): void
+    {
+        $post = Post::factory()->published()->create([
+            'content' => '<p>Hello</p><script>alert(1)</script><img src="x" onerror="alert(1)">',
+        ]);
+
+        $this->get(route('blog.show', $post->slug))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('post.content', fn (string $content) => str_contains($content, '<p>Hello</p>')
+                    && ! str_contains($content, '<script')
+                    && ! str_contains($content, 'onerror'))
+            );
     }
 
     public function test_post_resource_includes_expected_fields(): void

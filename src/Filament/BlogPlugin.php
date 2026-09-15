@@ -2,9 +2,9 @@
 
 namespace Modules\Blog\Filament;
 
-use App\Filament\ModulePlugin;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Saucebase\Core\Filament\ModulePlugin;
 
 class BlogPlugin implements Plugin
 {

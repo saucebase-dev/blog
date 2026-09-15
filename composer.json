@@ -16,6 +16,9 @@
         "Modules\\Blog\\Providers\\BlogServiceProvider"
       ],
       "aliases": {}
+    },
+    "saucebase": {
+      "frameworks": ["vue", "react"]
     }
   },
   "autoload": {

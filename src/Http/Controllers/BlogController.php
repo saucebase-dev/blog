@@ -2,6 +2,7 @@
 
 namespace Modules\Blog\Http\Controllers;
 
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Blog\Data\PostData;
@@ -35,14 +36,15 @@ class BlogController
 
         $related = Post::published()
             ->with(['category', 'author'])
-            ->where('id', '!=', $post->id)
-            ->inRandomOrder()
+            ->whereKeyNot($post->id)
+            ->when($post->category_id, fn ($query, int $categoryId) => $query->orderByRaw('category_id = ? desc', [$categoryId]))
+            ->orderByDesc('published_at')
             ->limit(3)
             ->get()
             ->map(fn (Post $p) => PostData::fromPost($p));
 
         return Inertia::render('Blog::Show', [
-            'post'    => PostData::fromPost($post)->withContent($post->content),
+            'post' => PostData::fromPost($post)->withContent(Str::sanitizeHtml($post->content)),
             'related' => $related,
         ])->withSSR();
     }

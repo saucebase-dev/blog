@@ -16,9 +16,10 @@ defineProps<{
             <!-- Cover image -->
             <div class="aspect-video overflow-hidden rounded-xl">
                 <img
-                    v-if="post.cover_url"
-                    :src="post.cover_url"
+                    v-if="post.card_url"
+                    :src="post.card_url"
                     :alt="post.title"
+                    loading="lazy"
                     class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div

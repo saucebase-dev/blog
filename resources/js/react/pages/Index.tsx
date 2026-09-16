@@ -25,7 +25,7 @@ export default function Index({ posts }: { posts: PaginatedPosts }) {
         >
             <section
                 data-testid="blog-hero"
-                className="from-secondary-900 to-secondary/30 text-foreground bg-linear-to-br pt-8"
+                className="from-primary-900 to-primary/30 text-foreground bg-linear-to-br pt-8"
             >
                 <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-6 py-20 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-5">

@@ -6,6 +6,8 @@ import { computed } from 'vue';
 import PostCard from '../components/PostCard.vue';
 import type { PaginatedPosts } from '../../types';
 
+import IconNewspaper from '~icons/heroicons/newspaper';
+
 const props = defineProps<{
     posts: PaginatedPosts;
 }>();
@@ -23,20 +25,36 @@ const canonical = computed(() =>
         :description="$t('Tips, insights, and updates from our team.')"
         :canonical="canonical"
     >
-        <div class="w-full py-16">
-            <main class="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
-                <!-- Header -->
-                <div class="mb-18">
-                    <h1
-                        class="text-foreground mb-3 text-5xl font-bold tracking-tight"
+        <!-- Hero -->
+        <section
+            data-testid="blog-hero"
+            class="from-secondary-900 to-secondary/30 text-foreground bg-linear-to-br pt-8"
+        >
+            <div
+                class="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-6 py-20 sm:flex-row sm:items-center sm:justify-between"
+            >
+                <div class="flex items-center gap-5">
+                    <div
+                        class="bg-foreground/5 rounded-full p-7 backdrop-blur-sm"
                     >
-                        {{ $t('Blog') }}
-                    </h1>
-                    <p class="text-muted-foreground text-2xl">
-                        {{ $t('Tips, insights, and updates from our team.') }}
-                    </p>
+                        <IconNewspaper class="size-14" />
+                    </div>
+                    <div>
+                        <h1 class="text-4xl font-bold tracking-tight">
+                            {{ $t('Blog') }}
+                        </h1>
+                        <p class="mt-2 max-w-2xl text-white/80">
+                            {{
+                                $t('Tips, insights, and updates from our team.')
+                            }}
+                        </p>
+                    </div>
                 </div>
+            </div>
+        </section>
 
+        <div class="w-full">
+            <main class="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
                 <!-- Empty state -->
                 <div
                     v-if="posts.data.length === 0"

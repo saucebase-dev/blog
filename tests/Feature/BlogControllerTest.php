@@ -4,6 +4,8 @@ namespace Modules\Blog\Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
@@ -73,6 +75,23 @@ class BlogControllerTest extends TestCase
             ->assertSee('<loc>'.route('blog.index').'</loc>', false)
             ->assertSee('<loc>'.route('blog.show.category', [$category->slug, $published->slug]).'</loc>', false)
             ->assertDontSee($draft->slug);
+    }
+
+    public function test_sitemap_entry_carries_the_cover_image(): void
+    {
+        Storage::fake('public');
+
+        $post = Post::factory()->published()->create();
+
+        $this->assertSame([], $post->toSitemapTag()->images);
+
+        $post->addMedia(UploadedFile::fake()->image('cover.jpg'))
+            ->toMediaCollection('cover');
+
+        $images = $post->refresh()->toSitemapTag()->images;
+
+        $this->assertCount(1, $images);
+        $this->assertSame($post->title, $images[0]->caption);
     }
 
     public function test_index_returns_paginated_response(): void

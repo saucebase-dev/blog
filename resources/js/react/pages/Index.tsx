@@ -1,3 +1,4 @@
+import { PageHero } from '@/components/ui/saucebase';
 import { useT } from '@/i18n';
 import SiteLayout from '@/layouts/SiteLayout';
 import { Link } from '@inertiajs/react';
@@ -23,28 +24,13 @@ export default function Index({ posts }: { posts: PaginatedPosts }) {
             description={t('Tips, insights, and updates from our team.')}
             canonical={canonical}
         >
-            <section
-                data-testid="blog-hero"
-                className="from-primary-900 to-primary/30 text-foreground bg-linear-to-br pt-8"
-            >
-                <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-6 py-20 sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-5">
-                        <div className="bg-foreground/5 rounded-full p-7 backdrop-blur-sm">
-                            <IconNewspaper className="size-14" />
-                        </div>
-                        <div>
-                            <h1 className="text-4xl font-bold tracking-tight">
-                                {t('Blog')}
-                            </h1>
-                            <p className="mt-2 max-w-2xl text-white/80">
-                                {t(
-                                    'Tips, insights, and updates from our team.',
-                                )}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <PageHero
+                testId="blog-hero"
+                title={t('Blog')}
+                description={t('Tips, insights, and updates from our team.')}
+                icon={IconNewspaper}
+                width="5xl"
+            />
 
             <div className="w-full">
                 <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-16">

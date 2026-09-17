@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { PageHero } from '@/components/ui/saucebase';
 import SiteLayout from '@/layouts/SiteLayout.vue';
 import { Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
@@ -25,33 +26,13 @@ const canonical = computed(() =>
         :description="$t('Tips, insights, and updates from our team.')"
         :canonical="canonical"
     >
-        <!-- Hero -->
-        <section
-            data-testid="blog-hero"
-            class="from-primary-900 to-primary/30 text-foreground bg-linear-to-br pt-8"
-        >
-            <div
-                class="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-6 py-20 sm:flex-row sm:items-center sm:justify-between"
-            >
-                <div class="flex items-center gap-5">
-                    <div
-                        class="bg-foreground/5 rounded-full p-7 backdrop-blur-sm"
-                    >
-                        <IconNewspaper class="size-14" />
-                    </div>
-                    <div>
-                        <h1 class="text-4xl font-bold tracking-tight">
-                            {{ $t('Blog') }}
-                        </h1>
-                        <p class="mt-2 max-w-2xl text-white/80">
-                            {{
-                                $t('Tips, insights, and updates from our team.')
-                            }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
+        <PageHero
+            test-id="blog-hero"
+            :title="$t('Blog')"
+            :description="$t('Tips, insights, and updates from our team.')"
+            :icon="IconNewspaper"
+            width="5xl"
+        />
 
         <div class="w-full">
             <main class="mx-auto w-full max-w-5xl flex-1 px-6 py-16">

@@ -122,7 +122,11 @@ class Post extends Model implements HasMedia, Sitemapable
 
     public function toSitemapTag(): Url
     {
-        return Url::create($this->url())->setLastModificationDate($this->updated_at);
+        $url = Url::create($this->url())->setLastModificationDate($this->updated_at);
+
+        $cover = $this->getFirstMediaUrl('cover');
+
+        return $cover === '' ? $url : $url->addImage($cover, $this->title);
     }
 
     public function scopePublished(Builder $query): Builder

@@ -8,7 +8,7 @@ use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
 
-class BlogDatabaseSeeder extends Seeder
+class DemoBlogDatabaseSeeder extends Seeder
 {
     public function run(): void
     {

@@ -34,6 +34,14 @@ The JSON-LD `<script>` escapes `<` as `<` so a title containing `</script>` cann
 
 When adding a frontend field: migration + model `$fillable`, then `PostData`, then regenerate types.
 
+### RSS Feed
+
+`/blog/feed` (`blog.feed`) is RSS 2.0 via spatie/laravel-feed. It is built directly in `BlogController::feed()` — a `Spatie\Feed\Feed` is `Responsable` — rather than through the package's `feed.feeds` config and `Route::feeds()` macro. The macro reads that config while registering routes, which races module config merging, and going without it keeps the app free of a published `config/feed.php`.
+
+The route must stay **above** `/blog/{slug}` in `routes/web.php`, or the catch-all resolves `feed` as a post slug.
+
+`Post::toFeedItem()` reuses `url()`, so feed links match the canonical category URLs.
+
 ### Dates
 
 `published_at` is sent as a date string (`2025-04-19`). `PostMeta` formats it with `timeZone: 'UTC'` so it shows the same day on the server render and in every browser time zone.

@@ -10,6 +10,9 @@
       "email": "hello@saucebase.dev"
     }
   ],
+  "require": {
+    "spatie/laravel-feed": "^4.5"
+  },
   "extra": {
     "laravel": {
       "providers": [

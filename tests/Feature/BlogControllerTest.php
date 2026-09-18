@@ -188,4 +188,16 @@ class BlogControllerTest extends TestCase
                 ->has('post.author.name')
             );
     }
+
+    public function test_feed_lists_published_posts_only(): void
+    {
+        $published = Post::factory()->published()->create();
+        $draft = Post::factory()->draft()->create();
+
+        $response = $this->get(route('blog.feed'))->assertOk();
+
+        $this->assertStringContainsString('application/xml', $response->headers->get('Content-Type'));
+        $response->assertSee($published->title, false);
+        $response->assertDontSee($draft->title, false);
+    }
 }

@@ -8,6 +8,8 @@ use Inertia\Response;
 use Modules\Blog\Data\PostData;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
+use Saucebase\Core\Settings\GeneralSettings;
+use Spatie\Feed\Feed;
 
 class BlogController
 {
@@ -21,6 +23,31 @@ class BlogController
         return Inertia::render('Blog::Index', [
             'posts' => $posts->through(fn (Post $post) => PostData::fromPost($post)),
         ])->withSSR();
+    }
+
+    /**
+     * The RSS feed of published posts.
+     *
+     * Built here rather than through the package's `feed.feeds` config and route
+     * macro: the module owns its route, and the app publishes no feed config.
+     */
+    public function feed(GeneralSettings $settings): Feed
+    {
+        $posts = Post::published()
+            ->with(['category', 'author'])
+            ->orderByDesc('published_at')
+            ->limit(50)
+            ->get();
+
+        return new Feed(
+            title: $settings->site_name,
+            items: $posts,
+            url: route('blog.feed'),
+            view: 'feed::rss',
+            description: $settings->site_description ?? $settings->site_tagline ?? __('Blog'),
+            language: app()->getLocale(),
+            format: 'rss',
+        );
     }
 
     public function show(string $categoryOrSlug, ?string $slug = null): Response

@@ -1,7 +1,7 @@
 import { PageHero } from '@/components/ui/saucebase';
 import { useT } from '@/i18n';
 import SiteLayout from '@/layouts/SiteLayout';
-import { Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 
 import type { PaginatedPosts } from '../../types';
 import PostCard from '../components/PostCard';
@@ -24,6 +24,15 @@ export default function Index({ posts }: { posts: PaginatedPosts }) {
             description={t('Tips, insights, and updates from our team.')}
             canonical={canonical}
         >
+            <Head>
+                <link
+                    rel="alternate"
+                    type="application/rss+xml"
+                    title={t('Blog')}
+                    href={route('blog.feed')}
+                />
+            </Head>
+
             <PageHero
                 testId="blog-hero"
                 title={t('Blog')}

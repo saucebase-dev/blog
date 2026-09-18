@@ -10,9 +10,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Modules\Blog\Enums\PostStatus;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Feed\Feedable;
+use Spatie\Feed\FeedItem;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Sitemap\Contracts\Sitemapable;
 use Spatie\Sitemap\Tags\Url;
@@ -30,7 +33,7 @@ use Spatie\Sitemap\Tags\Url;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-class Post extends Model implements HasMedia, Sitemapable
+class Post extends Model implements Feedable, HasMedia, Sitemapable
 {
     use HasFactory, InteractsWithMedia, Sluggable;
 
@@ -127,6 +130,17 @@ class Post extends Model implements HasMedia, Sitemapable
         $cover = $this->getFirstMediaUrl('cover');
 
         return $cover === '' ? $url : $url->addImage($cover, $this->title);
+    }
+
+    public function toFeedItem(): FeedItem
+    {
+        return FeedItem::create()
+            ->id($this->url())
+            ->title($this->title)
+            ->summary($this->excerpt ?? Str::limit(strip_tags($this->content), 300))
+            ->updated($this->published_at ?? $this->updated_at)
+            ->link($this->url())
+            ->authorName($this->author?->name ?? '');
     }
 
     public function scopePublished(Builder $query): Builder

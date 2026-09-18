@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { PageHero } from '@/components/ui/saucebase';
 import SiteLayout from '@/layouts/SiteLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 import PostCard from '../components/PostCard.vue';
@@ -26,6 +26,15 @@ const canonical = computed(() =>
         :description="$t('Tips, insights, and updates from our team.')"
         :canonical="canonical"
     >
+        <Head>
+            <link
+                rel="alternate"
+                type="application/rss+xml"
+                :title="$t('Blog')"
+                :href="route('blog.feed')"
+            />
+        </Head>
+
         <PageHero
             test-id="blog-hero"
             :title="$t('Blog')"

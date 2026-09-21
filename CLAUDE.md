@@ -22,6 +22,21 @@ Two routes resolve a post — with and without category prefix:
 
 `PostData::url` always points at the category route when the post has one, and the Show page uses it as the canonical URL.
 
+### Category And Tag Pages
+
+A post has **one** category, which owns its URL and canonical, and **many** tags (`blog_post_tag` pivot), which do not.
+
+- `/blog/category/{category}` → `blog.category`, `/blog/tag/{tag}` → `blog.tag`. Both render `Blog::Index` through `BlogController::listing()`, the same method as the blog index, with a `heading` prop the index leaves `null`. The canonical comes from the paginator's `path`, so one page serves all three.
+- They sit under `category/` and `tag/` rather than at `/blog/{category}` so they cannot collide with an uncategorised post at `/blog/{slug}`.
+- Registered **above** `/blog/{category}/{slug}`, which would otherwise swallow them. That makes `category` and `tag` unusable as category slugs, and `feed` as a post slug: `Category::RESERVED_SLUGS` / `Post::RESERVED_SLUGS` are fed to Sluggable (a generated slug gets a suffix) and to the Filament forms' `notIn()` (a typed one is rejected).
+- Related posts rank: same category, then most shared tags, then newest. The rule is `Post::relatedPosts()`; the controller only adds eager loads and the limit.
+- The sitemap lists a category or tag page only when it has a published post, and so does the category menu (`CategoryNav`) at the top of every listing page. There is deliberately no tag list: tags multiply and most stay thin, so they are reached from posts only.
+- The post page opens with breadcrumbs (Blog › category › post) and a matching `BreadcrumbList` JSON-LD, a second `ld+json` script beside the `Article` one.
+
+### Post Card Links
+
+The card's title link stretches over the whole card (`after:absolute after:inset-0`) instead of wrapping it, because the category and tag chips on the card are links too, and a link inside a link is invalid HTML. `PostCategory` and `PostTags` lift their links above the stretched link with `relative z-10`.
+
 ### Post Content Is Sanitized on Output
 
 The rich-editor HTML is rendered with `v-html` / `dangerouslySetInnerHTML`. `BlogController::show()` passes it through `Str::sanitizeHtml()` (Filament's Symfony sanitizer) first, so scripts and event handlers never reach the page. Keep that call if the controller changes.
@@ -44,7 +59,7 @@ The route must stay **above** `/blog/{slug}` in `routes/web.php`, or the catch-a
 
 ### Dates
 
-`published_at` is sent as a date string (`2025-04-19`). `PostMeta` formats it with `timeZone: 'UTC'` so it shows the same day on the server render and in every browser time zone.
+`published_at` is sent as a date string (`2025-04-19`). `PostMeta` formats it with the app's `formatDate()` (`@js/lib/dates`), which formats in UTC so it shows the same day on the server render and in every browser time zone.
 
 ---
 

@@ -2,12 +2,15 @@
 
 namespace Modules\Blog\Http\Controllers;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
+use Modules\Blog\Data\CategoryData;
 use Modules\Blog\Data\PostData;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Models\Tag;
 use Saucebase\Core\Settings\GeneralSettings;
 use Spatie\Feed\Feed;
 
@@ -15,13 +18,49 @@ class BlogController
 {
     public function index(): Response
     {
-        $posts = Post::published()
-            ->with(['category', 'author'])
+        return $this->listing(Post::published());
+    }
+
+    public function category(Category $category): Response
+    {
+        return $this->listing(Post::published()->whereBelongsTo($category), [
+            'title' => $category->name,
+            'description' => __('Posts filed under :name.', ['name' => $category->name]),
+        ], $category);
+    }
+
+    public function tag(Tag $tag): Response
+    {
+        return $this->listing(Post::published()->whereRelation('tags', 'blog_tags.id', $tag->id), [
+            'title' => '#'.$tag->name,
+            'description' => __('Posts tagged :name.', ['name' => $tag->name]),
+        ]);
+    }
+
+    /**
+     * One listing page for the whole blog, a category and a tag, so the three
+     * cannot drift apart.
+     *
+     * @param  Builder<Post>  $posts
+     * @param  array{title: string, description: string}|null  $heading  null on the blog index, which the page titles itself
+     * @param  Category|null  $activeCategory  the category being listed, highlighted in the category menu
+     */
+    private function listing(Builder $posts, ?array $heading = null, ?Category $activeCategory = null): Response
+    {
+        $posts = $posts
+            ->with(['category', 'tags', 'author'])
             ->orderByDesc('published_at')
             ->paginate(12);
 
         return Inertia::render('Blog::Index', [
             'posts' => $posts->through(fn (Post $post) => PostData::fromPost($post)),
+            'heading' => $heading,
+            // Only categories with something to read, the same rule the sitemap uses.
+            'categories' => Category::whereHas('posts', fn ($posts) => $posts->published())
+                ->orderBy('name')
+                ->get()
+                ->map(fn (Category $category) => CategoryData::from($category)),
+            'activeCategory' => $activeCategory?->slug,
         ])->withSSR();
     }
 
@@ -52,7 +91,7 @@ class BlogController
 
     public function show(string $categoryOrSlug, ?string $slug = null): Response
     {
-        $query = Post::published()->with(['category', 'author']);
+        $query = Post::published()->with(['category', 'tags', 'author']);
 
         if ($slug !== null) {
             $category = Category::where('slug', $categoryOrSlug)->firstOrFail();
@@ -61,11 +100,8 @@ class BlogController
             $post = $query->where('slug', $categoryOrSlug)->firstOrFail();
         }
 
-        $related = Post::published()
-            ->with(['category', 'author'])
-            ->whereKeyNot($post->id)
-            ->when($post->category_id, fn ($query, int $categoryId) => $query->orderByRaw('category_id = ? desc', [$categoryId]))
-            ->orderByDesc('published_at')
+        $related = $post->relatedPosts()
+            ->with(['category', 'tags', 'author'])
             ->limit(3)
             ->get()
             ->map(fn (Post $p) => PostData::fromPost($p));

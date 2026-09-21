@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useLocalization } from '@/composables/useLocalization';
+import { formatDate } from '@js/lib/dates';
 
 defineProps<{
     author: Modules.Blog.Data.AuthorData | null;
     publishedAt: string | null;
 }>();
 
-function formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        timeZone: 'UTC',
-    });
-}
+const { language } = useLocalization();
 </script>
 
 <template>
@@ -31,7 +26,7 @@ function formatDate(dateStr: string): string {
                 author.name
             }}</span>
             <time v-if="publishedAt" class="text-muted-foreground">{{
-                formatDate(publishedAt)
+                formatDate(publishedAt, language)
             }}</time>
         </div>
     </div>

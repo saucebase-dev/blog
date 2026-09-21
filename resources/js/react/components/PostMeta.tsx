@@ -1,20 +1,15 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useTranslation } from '@/i18n';
+import { formatDate } from '@js/lib/dates';
 
 interface PostMetaProps {
     author: Modules.Blog.Data.AuthorData | null;
     publishedAt: string | null;
 }
 
-function formatDate(dateStr: string): string {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        timeZone: 'UTC',
-    });
-}
-
 export default function PostMeta({ author, publishedAt }: PostMetaProps) {
+    const { locale } = useTranslation();
+
     return (
         <div className="flex items-center gap-2">
             {author && (
@@ -36,7 +31,7 @@ export default function PostMeta({ author, publishedAt }: PostMetaProps) {
                 )}
                 {publishedAt && (
                     <time className="text-muted-foreground">
-                        {formatDate(publishedAt)}
+                        {formatDate(publishedAt, locale)}
                     </time>
                 )}
             </div>

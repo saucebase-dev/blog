@@ -4,6 +4,7 @@ namespace Modules\Blog\Filament\Resources\Blog\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Modules\Blog\Models\Category;
 
 class CategoryForm
 {
@@ -21,6 +22,7 @@ class CategoryForm
                     ->nullable()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true)
+                    ->notIn(Category::RESERVED_SLUGS)
                     ->placeholder(__('Auto-generated from name')),
             ]);
     }

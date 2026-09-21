@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Models\Tag;
 use Tests\TestCase;
 
 class BlogControllerTest extends TestCase
@@ -187,6 +188,88 @@ class BlogControllerTest extends TestCase
                 ->has('post.category.name')
                 ->has('post.author.name')
             );
+    }
+
+    public function test_category_page_lists_only_its_published_posts(): void
+    {
+        $category = Category::factory()->create(['name' => 'Guides']);
+        $inCategory = Post::factory()->published()->create(['category_id' => $category->id]);
+        Post::factory()->draft()->create(['category_id' => $category->id]);
+        Post::factory()->published()->create(['category_id' => Category::factory()]);
+        Category::factory()->create();
+
+        $this->get(route('blog.category', $category->slug))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('heading.title', 'Guides')
+                ->has('posts.data', 1)
+                ->where('posts.data.0.id', $inCategory->id)
+                ->where('posts.path', route('blog.category', $category->slug))
+                ->where('activeCategory', $category->slug)
+                ->has('categories', 2)
+            );
+    }
+
+    public function test_tag_page_lists_only_published_posts_with_that_tag(): void
+    {
+        $tag = Tag::factory()->create(['name' => 'laravel']);
+        $tagged = Post::factory()->published()->hasAttached($tag)->create();
+        Post::factory()->draft()->hasAttached($tag)->create();
+        Post::factory()->published()->create();
+
+        $this->get(route('blog.tag', $tag->slug))
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->where('heading.title', '#laravel')
+                ->has('posts.data', 1)
+                ->where('posts.data.0.id', $tagged->id)
+                ->where('posts.data.0.tags.0.slug', $tag->slug)
+            );
+    }
+
+    public function test_unknown_category_or_tag_page_is_not_found(): void
+    {
+        $this->get(route('blog.category', 'nope'))->assertNotFound();
+        $this->get(route('blog.tag', 'nope'))->assertNotFound();
+    }
+
+    public function test_related_posts_rank_shared_tags_above_newer_posts(): void
+    {
+        $tag = Tag::factory()->create();
+        $post = Post::factory()->published()->hasAttached($tag)->create(['category_id' => null]);
+        $sharesTag = Post::factory()->hasAttached($tag)->create(['category_id' => null, 'published_at' => now()->subYear()]);
+        Post::factory(3)->create(['category_id' => null, 'published_at' => now()->subHour()]);
+
+        $this->get(route('blog.show', $post->slug))
+            ->assertInertia(fn ($page) => $page->where('related.0.id', $sharesTag->id));
+    }
+
+    public function test_sitemap_lists_category_and_tag_pages_only_when_they_have_published_posts(): void
+    {
+        $category = Category::factory()->create();
+        $tag = Tag::factory()->create();
+        Post::factory()->published()->hasAttached($tag)->create(['category_id' => $category->id]);
+
+        $emptyCategory = Category::factory()->create();
+        $draftOnlyTag = Tag::factory()->create();
+        Post::factory()->draft()->hasAttached($draftOnlyTag)->create(['category_id' => $emptyCategory->id]);
+
+        $this->get(route('sitemap'))
+            ->assertSee('<loc>'.route('blog.category', $category->slug).'</loc>', false)
+            ->assertSee('<loc>'.route('blog.tag', $tag->slug).'</loc>', false)
+            ->assertDontSee(route('blog.category', $emptyCategory->slug), false)
+            ->assertDontSee(route('blog.tag', $draftOnlyTag->slug), false);
+    }
+
+    public function test_a_category_named_after_a_listing_route_keeps_its_posts_reachable(): void
+    {
+        $category = Category::factory()->create(['name' => 'Tag']);
+        $post = Post::factory()->published()->create(['category_id' => $category->id]);
+
+        $this->assertNotSame('tag', $category->slug);
+        $this->get($post->url())
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page->where('post.id', $post->id));
     }
 
     public function test_feed_lists_published_posts_only(): void

@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Models\Tag;
 
 class DemoBlogDatabaseSeeder extends Seeder
 {
@@ -29,7 +30,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'published_at' => now()->subMonths(5),
             'category_id' => $gettingStarted->id,
             'author_id' => $author?->id,
-        ], $image('what-is-saucebase.jpg'));
+        ], $image('what-is-saucebase.jpg'), ['Laravel', 'SaaS']);
 
         $this->createPost([
             'title' => 'Stop Rebuilding the Same Boilerplate Every Project',
@@ -39,7 +40,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'published_at' => now()->subMonths(4),
             'category_id' => $gettingStarted->id,
             'author_id' => $author?->id,
-        ]);
+        ], tags: ['Laravel', 'Productivity']);
 
         $this->createPost([
             'title' => 'The Modern Laravel Stack: Inertia.js, Vue 3 or React, and Tailwind Done Right',
@@ -49,7 +50,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'published_at' => now()->subMonths(3),
             'category_id' => $devExperience->id,
             'author_id' => $author?->id,
-        ], $image('tech-stack.jpg'));
+        ], $image('tech-stack.jpg'), ['Laravel', 'Inertia', 'Vue', 'React', 'Tailwind']);
 
         $this->createPost([
             'title' => 'Your First Module: Scaffold and Ship in Under 10 Minutes',
@@ -59,7 +60,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'published_at' => now()->subMonths(2),
             'category_id' => $featuresModules->id,
             'author_id' => $author?->id,
-        ], $image('add-your-saucebase.jpg'));
+        ], $image('add-your-saucebase.jpg'), ['Modules', 'Tutorial']);
 
         $this->createPost([
             'title' => 'Auth, Billing, and Privacy: The Three Modules Every SaaS Needs',
@@ -69,7 +70,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'published_at' => now()->subMonth(),
             'category_id' => $featuresModules->id,
             'author_id' => $author?->id,
-        ], $image('cookies-or-privacy.jpg'));
+        ], $image('cookies-or-privacy.jpg'), ['Modules', 'SaaS', 'Stripe']);
 
         $this->createPost([
             'title' => 'Copy-and-Own: The Philosophy Behind Saucebase Modules',
@@ -79,7 +80,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'published_at' => now()->subWeeks(2),
             'category_id' => $devExperience->id,
             'author_id' => $author?->id,
-        ], $image('your-recipes.jpg'));
+        ], $image('your-recipes.jpg'), ['Modules']);
 
         $this->createPost([
             'title' => 'Vue or React? What about both!',
@@ -89,12 +90,20 @@ class DemoBlogDatabaseSeeder extends Seeder
             'published_at' => now()->subDays(3),
             'category_id' => $devExperience->id,
             'author_id' => $author?->id,
-        ], $image('vue-and-react.jpg'));
+        ], $image('vue-and-react.jpg'), ['Vue', 'React', 'Inertia']);
     }
 
-    private function createPost(array $data, string $coverImage = ''): Post
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  list<string>  $tags
+     */
+    private function createPost(array $data, string $coverImage = '', array $tags = []): Post
     {
         $post = Post::firstOrCreate(['title' => $data['title']], $data);
+
+        $post->tags()->syncWithoutDetaching(
+            collect($tags)->map(fn (string $name) => Tag::firstOrCreate(['name' => $name])->id)
+        );
 
         if ($coverImage && file_exists($coverImage)) {
             $post->addMedia($coverImage)->preservingOriginal()->toMediaCollection('cover', 'public');

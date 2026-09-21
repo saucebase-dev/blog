@@ -3,6 +3,7 @@
 namespace Modules\Blog\Data;
 
 use Modules\Blog\Models\Post;
+use Modules\Blog\Models\Tag;
 use Spatie\LaravelData\Data;
 use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
@@ -19,6 +20,8 @@ final class PostData extends Data
         public ?string $published_at,
         public ?string $updated_at,
         public ?CategoryData $category,
+        /** @var TagData[] */
+        public array $tags,
         public ?AuthorData $author,
         public string $url,
         public ?string $content = null,
@@ -40,6 +43,7 @@ final class PostData extends Data
             published_at: $post->published_at?->toDateString(),
             updated_at: $post->updated_at?->toDateString(),
             category: $post->category ? CategoryData::from($post->category) : null,
+            tags: $post->tags->map(fn (Tag $tag) => TagData::from($tag))->all(),
             author: $post->author ? AuthorData::from($post->author) : null,
             url: $post->url(),
         );
@@ -57,6 +61,7 @@ final class PostData extends Data
             published_at: $this->published_at,
             updated_at: $this->updated_at,
             category: $this->category,
+            tags: $this->tags,
             author: $this->author,
             url: $this->url,
             content: $content,

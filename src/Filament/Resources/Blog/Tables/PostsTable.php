@@ -33,6 +33,11 @@ class PostsTable
                     ->placeholder(__('—'))
                     ->sortable(),
 
+                TextColumn::make('tags.name')
+                    ->badge()
+                    ->placeholder(__('—'))
+                    ->toggleable(),
+
                 TextColumn::make('status')
                     ->badge()
                     ->sortable(),
@@ -54,6 +59,11 @@ class PostsTable
             ->filters([
                 SelectFilter::make('status')
                     ->options(PostStatus::class),
+                SelectFilter::make('tags')
+                    ->relationship('tags', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
             ])
             ->recordActions([
                 ViewAction::make('view_post')

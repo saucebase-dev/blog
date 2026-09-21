@@ -2,28 +2,40 @@
 import { PageHero } from '@/components/ui/saucebase';
 import SiteLayout from '@/layouts/SiteLayout.vue';
 import { Head, Link } from '@inertiajs/vue3';
+import { trans } from 'laravel-vue-i18n';
 import { computed } from 'vue';
 
+import CategoryNav from '../components/CategoryNav.vue';
 import PostCard from '../components/PostCard.vue';
-import type { PaginatedPosts } from '../../types';
+import type { ListingHeading, PaginatedPosts } from '../../types';
 
 import IconNewspaper from '~icons/heroicons/newspaper';
 
 const props = defineProps<{
     posts: PaginatedPosts;
+    heading: ListingHeading | null;
+    categories: Modules.Blog.Data.CategoryData[];
+    activeCategory: string | null;
 }>();
+
+const title = computed(() => props.heading?.title ?? trans('Blog'));
+const description = computed(
+    () =>
+        props.heading?.description ??
+        trans('Tips, insights, and updates from our team.'),
+);
 
 const canonical = computed(() =>
     props.posts.current_page > 1
-        ? route('blog.index', { page: props.posts.current_page })
-        : route('blog.index'),
+        ? `${props.posts.path}?page=${props.posts.current_page}`
+        : props.posts.path,
 );
 </script>
 
 <template>
     <SiteLayout
-        :title="$t('Blog')"
-        :description="$t('Tips, insights, and updates from our team.')"
+        :title="title"
+        :description="description"
         :canonical="canonical"
     >
         <Head>
@@ -37,14 +49,20 @@ const canonical = computed(() =>
 
         <PageHero
             test-id="blog-hero"
-            :title="$t('Blog')"
-            :description="$t('Tips, insights, and updates from our team.')"
+            :title="title"
+            :description="description"
             :icon="IconNewspaper"
             width="5xl"
         />
 
         <div class="w-full">
             <main class="mx-auto w-full max-w-5xl flex-1 px-6 py-16">
+                <CategoryNav
+                    :categories="categories"
+                    :active="activeCategory"
+                    :all-active="heading === null"
+                />
+
                 <!-- Empty state -->
                 <div
                     v-if="posts.data.length === 0"

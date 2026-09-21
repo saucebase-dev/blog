@@ -9,13 +9,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Modules\Blog\Enums\PostStatus;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Spatie\Sitemap\Contracts\Sitemapable;
 use Spatie\Sitemap\Tags\Url;
@@ -50,6 +51,12 @@ class Post extends Model implements Feedable, HasMedia, Sitemapable
         'author_id',
     ];
 
+    /**
+     * Slugs a post cannot take: an uncategorised post lives at `/blog/{post}`, and
+     * the feed's URL is matched first.
+     */
+    public const RESERVED_SLUGS = ['feed'];
+
     protected static function booted(): void
     {
         static::saving(function (Post $post): void {
@@ -68,12 +75,12 @@ class Post extends Model implements Feedable, HasMedia, Sitemapable
     }
 
     /**
-     * @return array<string, array<string, string>>
+     * @return array<string, array{source: string, reserved: list<string>}>
      */
     public function sluggable(): array
     {
         return [
-            'slug' => ['source' => 'title'],
+            'slug' => ['source' => 'title', 'reserved' => self::RESERVED_SLUGS],
         ];
     }
 
@@ -103,6 +110,14 @@ class Post extends Model implements Feedable, HasMedia, Sitemapable
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    /**
+     * @return BelongsToMany<Tag, $this>
+     */
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(Tag::class, 'blog_post_tag');
     }
 
     /**
@@ -141,6 +156,22 @@ class Post extends Model implements Feedable, HasMedia, Sitemapable
             ->updated($this->published_at ?? $this->updated_at)
             ->link($this->url())
             ->authorName($this->author?->name ?? '');
+    }
+
+    /**
+     * Other published posts, closest first: same category, then most tags in
+     * common, then newest.
+     *
+     * @return Builder<Post>
+     */
+    public function relatedPosts(): Builder
+    {
+        return static::published()
+            ->whereKeyNot($this->id)
+            ->withCount(['tags as shared_tags_count' => fn (Builder $tags) => $tags->whereIn('blog_tags.id', $this->tags->modelKeys())])
+            ->when($this->category_id, fn (Builder $query, int $categoryId) => $query->orderByRaw('category_id = ? desc', [$categoryId]))
+            ->orderByDesc('shared_tags_count')
+            ->orderByDesc('published_at');
     }
 
     public function scopePublished(Builder $query): Builder

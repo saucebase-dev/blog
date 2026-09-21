@@ -11,6 +11,7 @@ use Modules\Blog\Filament\Resources\Blog\Pages\CreatePost;
 use Modules\Blog\Filament\Resources\Blog\Pages\EditPost;
 use Modules\Blog\Filament\Resources\Blog\Pages\ListPosts;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Models\Tag;
 use Tests\TestCase;
 
 class PostResourceTest extends TestCase
@@ -54,6 +55,21 @@ class PostResourceTest extends TestCase
             'title' => 'Test Post',
             'author_id' => $this->admin->id,
         ]);
+    }
+
+    public function test_admin_can_tag_a_post(): void
+    {
+        $post = Post::factory()->create();
+        $tags = Tag::factory(2)->create();
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(EditPost::class, ['record' => $post->id])
+            ->fillForm(['tags' => $tags->modelKeys()])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertEqualsCanonicalizing($tags->modelKeys(), $post->tags()->pluck('blog_tags.id')->all());
     }
 
     public function test_admin_can_edit_post(): void

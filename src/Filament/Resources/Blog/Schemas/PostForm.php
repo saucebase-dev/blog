@@ -12,6 +12,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Modules\Blog\Enums\PostStatus;
+use Modules\Blog\Models\Post;
 
 class PostForm
 {
@@ -33,6 +34,7 @@ class PostForm
                         ->nullable()
                         ->maxLength(255)
                         ->unique(ignoreRecord: true)
+                        ->notIn(Post::RESERVED_SLUGS)
                         ->placeholder(__('Auto-generated from title')),
 
                     RichEditor::make('content')
@@ -82,6 +84,21 @@ class PostForm
                                 ->searchable()
                                 ->preload()
                                 ->nullable(),
+                        ]),
+
+                    Section::make(__('Tags'))
+                        ->schema([
+                            Select::make('tags')
+                                ->hiddenLabel()
+                                ->relationship('tags', 'name')
+                                ->multiple()
+                                ->createOptionForm([
+                                    TextInput::make('name')
+                                        ->required()
+                                        ->maxLength(255),
+                                ])
+                                ->searchable()
+                                ->preload(),
                         ]),
 
                     Section::make(__('Featured image'))

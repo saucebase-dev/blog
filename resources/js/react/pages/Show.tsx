@@ -1,9 +1,19 @@
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { useT } from '@/i18n';
 import SiteLayout from '@/layouts/SiteLayout';
 import { Head, Link } from '@inertiajs/react';
 
 import PostCard from '../components/PostCard';
+import PostCategory from '../components/PostCategory';
 import PostMeta from '../components/PostMeta';
+import PostTags from '../components/PostTags';
 
 interface ShowProps {
     post: Modules.Blog.Data.PostData;
@@ -25,6 +35,29 @@ export default function Show({ post, related }: ShowProps) {
             ? { '@type': 'Person', name: post.author.name }
             : undefined,
         url: post.url,
+    };
+
+    // The same trail as the visible breadcrumbs, which search results can show
+    // in place of the raw URL.
+    const breadcrumbJsonLd = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { name: t('Blog'), item: route('blog.index') },
+            ...(post.category
+                ? [
+                      {
+                          name: post.category.name,
+                          item: route('blog.category', post.category.slug),
+                      },
+                  ]
+                : []),
+            { name: post.title, item: post.url },
+        ].map((crumb, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            ...crumb,
+        })),
     };
 
     return (
@@ -54,15 +87,54 @@ export default function Show({ post, related }: ShowProps) {
                         __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
                     }}
                 />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify(breadcrumbJsonLd).replace(
+                            /</g,
+                            '\\u003c',
+                        ),
+                    }}
+                />
             </Head>
             <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-28">
-                <Link
-                    href={route('blog.index')}
-                    data-testid="back-to-blog"
-                    className="text-muted-foreground hover:text-foreground mb-8 inline-flex items-center gap-1 text-sm transition-colors"
-                >
-                    ← {t('Back to Blog')}
-                </Link>
+                <Breadcrumb className="mb-8">
+                    <BreadcrumbList>
+                        <BreadcrumbItem>
+                            <BreadcrumbLink asChild>
+                                <Link
+                                    href={route('blog.index')}
+                                    data-testid="back-to-blog"
+                                >
+                                    {t('Blog')}
+                                </Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                        {post.category && (
+                            <>
+                                <BreadcrumbSeparator />
+                                <BreadcrumbItem>
+                                    <BreadcrumbLink asChild>
+                                        <Link
+                                            href={route(
+                                                'blog.category',
+                                                post.category.slug,
+                                            )}
+                                        >
+                                            {post.category.name}
+                                        </Link>
+                                    </BreadcrumbLink>
+                                </BreadcrumbItem>
+                            </>
+                        )}
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem className="min-w-0">
+                            <BreadcrumbPage className="truncate">
+                                {post.title}
+                            </BreadcrumbPage>
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
 
                 <h1
                     data-testid="post-title"
@@ -71,7 +143,13 @@ export default function Show({ post, related }: ShowProps) {
                     {post.title}
                 </h1>
 
-                <div className="mb-10">
+                <div className="mb-10 space-y-4">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                        {post.category && (
+                            <PostCategory category={post.category} />
+                        )}
+                        <PostTags tags={post.tags} />
+                    </div>
                     <PostMeta
                         author={post.author}
                         publishedAt={post.published_at}

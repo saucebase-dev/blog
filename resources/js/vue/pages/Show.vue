@@ -1,10 +1,21 @@
 <script setup lang="ts">
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import SiteLayout from '@/layouts/SiteLayout.vue';
+import { trans } from 'laravel-vue-i18n';
 import { Head, Link } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
 import PostCard from '../components/PostCard.vue';
 import PostMeta from '../components/PostMeta.vue';
+import PostCategory from '../components/PostCategory.vue';
+import PostTags from '../components/PostTags.vue';
 const props = defineProps<{
     post: Modules.Blog.Data.PostData;
     related: Modules.Blog.Data.PostData[];
@@ -25,6 +36,34 @@ const jsonLd = computed(() =>
             ? { '@type': 'Person', name: props.post.author.name }
             : undefined,
         url: props.post.url,
+    }).replaceAll('<', '\\u003c'),
+);
+
+// The same trail as the visible breadcrumbs, which search results can show in
+// place of the raw URL.
+const breadcrumbJsonLd = computed(() =>
+    JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            { name: trans('Blog'), item: route('blog.index') },
+            ...(props.post.category
+                ? [
+                      {
+                          name: props.post.category.name,
+                          item: route(
+                              'blog.category',
+                              props.post.category.slug,
+                          ),
+                      },
+                  ]
+                : []),
+            { name: props.post.title, item: props.post.url },
+        ].map((crumb, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            ...crumb,
+        })),
     }).replaceAll('<', '\\u003c'),
 );
 </script>
@@ -51,16 +90,48 @@ const jsonLd = computed(() =>
             <component :is="'script'" type="application/ld+json">{{
                 jsonLd
             }}</component>
+            <component :is="'script'" type="application/ld+json">{{
+                breadcrumbJsonLd
+            }}</component>
         </Head>
         <main class="mx-auto w-full max-w-3xl flex-1 px-6 py-28">
-            <!-- Back link -->
-            <Link
-                :href="route('blog.index')"
-                data-testid="back-to-blog"
-                class="text-muted-foreground hover:text-foreground mb-8 inline-flex items-center gap-1 text-sm transition-colors"
-            >
-                ← {{ $t('Back to Blog') }}
-            </Link>
+            <Breadcrumb class="mb-8">
+                <BreadcrumbList>
+                    <BreadcrumbItem>
+                        <BreadcrumbLink as-child>
+                            <Link
+                                :href="route('blog.index')"
+                                data-testid="back-to-blog"
+                            >
+                                {{ $t('Blog') }}
+                            </Link>
+                        </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <template v-if="post.category">
+                        <BreadcrumbSeparator />
+                        <BreadcrumbItem>
+                            <BreadcrumbLink as-child>
+                                <Link
+                                    :href="
+                                        route(
+                                            'blog.category',
+                                            post.category.slug,
+                                        )
+                                    "
+                                >
+                                    {{ post.category.name }}
+                                </Link>
+                            </BreadcrumbLink>
+                        </BreadcrumbItem>
+                    </template>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem class="min-w-0">
+                        <BreadcrumbPage class="truncate">
+                            {{ post.title }}
+                        </BreadcrumbPage>
+                    </BreadcrumbItem>
+                </BreadcrumbList>
+            </Breadcrumb>
 
             <!-- Title -->
             <h1
@@ -70,8 +141,15 @@ const jsonLd = computed(() =>
                 {{ post.title }}
             </h1>
 
-            <!-- Meta: author + date -->
-            <div class="mb-10">
+            <!-- Meta: category, tags, author, date -->
+            <div class="mb-10 space-y-4">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <PostCategory
+                        v-if="post.category"
+                        :category="post.category"
+                    />
+                    <PostTags :tags="post.tags" />
+                </div>
                 <PostMeta
                     :author="post.author"
                     :published-at="post.published_at"

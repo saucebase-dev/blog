@@ -7,6 +7,7 @@ use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Modules\Blog\Filament\Resources\Blog\CategoryResource;
 use Modules\Blog\Filament\Resources\Blog\PostResource;
+use Modules\Blog\Filament\Resources\Blog\TagResource;
 
 class ListPosts extends ListRecords
 {
@@ -19,6 +20,11 @@ class ListPosts extends ListRecords
                 ->label(__('Manage Categories'))
                 ->icon('heroicon-o-tag')
                 ->url(CategoryResource::getUrl())
+                ->color('gray'),
+            Action::make('tags')
+                ->label(__('Manage Tags'))
+                ->icon('heroicon-o-hashtag')
+                ->url(TagResource::getUrl())
                 ->color('gray'),
             CreateAction::make(),
         ];

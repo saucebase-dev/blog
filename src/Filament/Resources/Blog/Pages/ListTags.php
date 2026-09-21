@@ -4,14 +4,14 @@ namespace Modules\Blog\Filament\Resources\Blog\Pages;
 
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use Modules\Blog\Filament\Resources\Blog\CategoryResource;
+use Modules\Blog\Filament\Resources\Blog\TagResource;
 use Modules\Blog\Filament\Traits\BreadcrumbsUnderPosts;
 
-class ListCategories extends ListRecords
+class ListTags extends ListRecords
 {
     use BreadcrumbsUnderPosts;
 
-    protected static string $resource = CategoryResource::class;
+    protected static string $resource = TagResource::class;
 
     protected function getHeaderActions(): array
     {

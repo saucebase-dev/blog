@@ -6,6 +6,8 @@ use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Modules\Blog\Contracts\Redirectable;
+use Modules\Blog\Traits\HasRedirects;
 use Spatie\Sitemap\Contracts\Sitemapable;
 use Spatie\Sitemap\Tags\Url;
 
@@ -14,9 +16,9 @@ use Spatie\Sitemap\Tags\Url;
  * @property string $name
  * @property string $slug
  */
-class Tag extends Model implements Sitemapable
+class Tag extends Model implements Redirectable, Sitemapable
 {
-    use HasFactory, Sluggable;
+    use HasFactory, HasRedirects, Sluggable;
 
     protected $table = 'blog_tags';
 
@@ -43,6 +45,12 @@ class Tag extends Model implements Sitemapable
     public function url(): string
     {
         return route('blog.tag', $this->slug);
+    }
+
+    /** A tag with only drafts is hidden: its name can give away an unannounced post. */
+    public function isPubliclyVisible(): bool
+    {
+        return $this->posts()->published()->exists();
     }
 
     public function toSitemapTag(): Url

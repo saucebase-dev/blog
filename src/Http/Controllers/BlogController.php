@@ -3,6 +3,8 @@
 namespace Modules\Blog\Http\Controllers;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -10,6 +12,7 @@ use Modules\Blog\Data\CategoryData;
 use Modules\Blog\Data\PostData;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Models\Redirect;
 use Modules\Blog\Models\Tag;
 use Saucebase\Core\Settings\GeneralSettings;
 use Spatie\Feed\Feed;
@@ -23,6 +26,8 @@ class BlogController
 
     public function category(Category $category): Response
     {
+        abort_unless($category->isPubliclyVisible(), 404);
+
         return $this->listing(Post::published()->whereBelongsTo($category), [
             'title' => $category->name,
             'description' => __('Posts filed under :name.', ['name' => $category->name]),
@@ -31,6 +36,8 @@ class BlogController
 
     public function tag(Tag $tag): Response
     {
+        abort_unless($tag->isPubliclyVisible(), 404);
+
         return $this->listing(Post::published()->whereRelation('tags', 'blog_tags.id', $tag->id), [
             'title' => '#'.$tag->name,
             'description' => __('Posts tagged :name.', ['name' => $tag->name]),
@@ -89,15 +96,16 @@ class BlogController
         );
     }
 
-    public function show(string $categoryOrSlug, ?string $slug = null): Response
+    public function show(Request $request, string $categoryOrSlug, ?string $slug = null): Response|RedirectResponse
     {
         $query = Post::published()->with(['category', 'tags', 'author']);
 
-        if ($slug !== null) {
-            $category = Category::where('slug', $categoryOrSlug)->firstOrFail();
-            $post = $query->where('category_id', $category->id)->where('slug', $slug)->firstOrFail();
-        } else {
-            $post = $query->where('slug', $categoryOrSlug)->firstOrFail();
+        $post = $slug !== null
+            ? $query->whereRelation('category', 'slug', $categoryOrSlug)->where('slug', $slug)->first()
+            : $query->where('slug', $categoryOrSlug)->first();
+
+        if ($post === null) {
+            return Redirect::responseFor($request);
         }
 
         $related = $post->relatedPosts()

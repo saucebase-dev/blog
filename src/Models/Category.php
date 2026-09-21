@@ -6,6 +6,8 @@ use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Blog\Contracts\Redirectable;
+use Modules\Blog\Traits\HasRedirects;
 use Spatie\Sitemap\Contracts\Sitemapable;
 use Spatie\Sitemap\Tags\Url;
 
@@ -14,9 +16,9 @@ use Spatie\Sitemap\Tags\Url;
  * @property string $name
  * @property string $slug
  */
-class Category extends Model implements Sitemapable
+class Category extends Model implements Redirectable, Sitemapable
 {
-    use HasFactory, Sluggable;
+    use HasFactory, HasRedirects, Sluggable;
 
     protected $table = 'blog_categories';
 
@@ -28,6 +30,19 @@ class Category extends Model implements Sitemapable
      * matched first.
      */
     public const RESERVED_SLUGS = ['category', 'tag'];
+
+    protected static function booted(): void
+    {
+        // The category's own page is remembered by `HasRedirects`; its posts'
+        // URLs change too, without any post being saved.
+        static::updated(function (Category $category): void {
+            if ($category->wasChanged('slug')) {
+                foreach ($category->posts as $post) {
+                    $post->rememberPath(Post::pathFor($category->getOriginal('slug'), $post->slug));
+                }
+            }
+        });
+    }
 
     /**
      * @return array<string, array{source: string, reserved: list<string>}>
@@ -50,6 +65,12 @@ class Category extends Model implements Sitemapable
     public function url(): string
     {
         return route('blog.category', $this->slug);
+    }
+
+    /** A category with only drafts is hidden: its name can give away an unannounced post. */
+    public function isPubliclyVisible(): bool
+    {
+        return $this->posts()->published()->exists();
     }
 
     public function toSitemapTag(): Url

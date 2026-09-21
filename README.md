@@ -25,10 +25,11 @@ Adds `/blog` with posts, categories, tags, cover images and an RSS feed. Write i
 - **Tags** — as many per post as you like, each with its own page
 - **Browse by topic** — a category menu on every listing page
 - **Scheduling** — set a publish date and the post goes live on its own
+- **Old links keep working** — change a slug or move a post to another category, and the old URL redirects to the new one
 - **Built for search** — server-rendered pages, meta tags, breadcrumbs, and structured data
 - **RSS feed** — at `/blog/feed`
 - **Safe by default** — post HTML is cleaned before it reaches the page
-- **Admin panel** — write and manage posts at `/admin`
+- **Admin panel** — manage posts, categories and tags at `/admin`
 - **Vue and React** — works on both
 
 ## Requirements

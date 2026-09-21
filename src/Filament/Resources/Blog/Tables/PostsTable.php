@@ -59,6 +59,10 @@ class PostsTable
             ->filters([
                 SelectFilter::make('status')
                     ->options(PostStatus::class),
+                SelectFilter::make('category')
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
                 SelectFilter::make('tags')
                     ->relationship('tags', 'name')
                     ->multiple()

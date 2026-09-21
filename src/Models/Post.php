@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Modules\Blog\Contracts\Redirectable;
 use Modules\Blog\Enums\PostStatus;
+use Modules\Blog\Traits\HasRedirects;
 use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
 use Spatie\MediaLibrary\HasMedia;
@@ -34,9 +36,9 @@ use Spatie\Sitemap\Tags\Url;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-class Post extends Model implements Feedable, HasMedia, Sitemapable
+class Post extends Model implements Feedable, HasMedia, Redirectable, Sitemapable
 {
-    use HasFactory, InteractsWithMedia, Sluggable;
+    use HasFactory, HasRedirects, InteractsWithMedia, Sluggable;
 
     protected $table = 'blog_posts';
 
@@ -136,6 +138,21 @@ class Post extends Model implements Feedable, HasMedia, Sitemapable
         return $this->category
             ? route('blog.show.category', [$this->category->slug, $this->slug])
             : route('blog.show', $this->slug);
+    }
+
+    public function isPubliclyVisible(): bool
+    {
+        return static::published()->whereKey($this->id)->exists();
+    }
+
+    /**
+     * The path a post with this category and slug lives at, e.g. `/blog/news/hello`.
+     */
+    public static function pathFor(?string $categorySlug, string $slug): string
+    {
+        return $categorySlug !== null
+            ? route('blog.show.category', [$categorySlug, $slug], absolute: false)
+            : route('blog.show', $slug, absolute: false);
     }
 
     public function toSitemapTag(): Url

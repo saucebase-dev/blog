@@ -24,14 +24,26 @@ Two routes resolve a post — with and without category prefix:
 
 ### Category And Tag Pages
 
-A post has **one** category, which owns its URL and canonical, and **many** tags (`blog_post_tag` pivot), which do not.
+A post has **one** category, which owns its URL and canonical, and **many** tags (`blog_post_tag` pivot), which do not. Both are managed in the admin from the posts list (*Manage Categories*, *Manage Tags*); neither is in the navigation. Their pages carry `BreadcrumbsUnderPosts` (`Posts > Tags > …`), and their post counts link to the posts list pre-filtered through the `category` / `tags` table filters, so renaming either filter breaks those links.
 
 - `/blog/category/{category}` → `blog.category`, `/blog/tag/{tag}` → `blog.tag`. Both render `Blog::Index` through `BlogController::listing()`, the same method as the blog index, with a `heading` prop the index leaves `null`. The canonical comes from the paginator's `path`, so one page serves all three.
 - They sit under `category/` and `tag/` rather than at `/blog/{category}` so they cannot collide with an uncategorised post at `/blog/{slug}`.
 - Registered **above** `/blog/{category}/{slug}`, which would otherwise swallow them. That makes `category` and `tag` unusable as category slugs, and `feed` as a post slug: `Category::RESERVED_SLUGS` / `Post::RESERVED_SLUGS` are fed to Sluggable (a generated slug gets a suffix) and to the Filament forms' `notIn()` (a typed one is rejected).
 - Related posts rank: same category, then most shared tags, then newest. The rule is `Post::relatedPosts()`; the controller only adds eager loads and the limit.
-- The sitemap lists a category or tag page only when it has a published post, and so does the category menu (`CategoryNav`) at the top of every listing page. There is deliberately no tag list: tags multiply and most stay thin, so they are reached from posts only.
+- A category or tag page is a 404 unless it has a published post: a draft-only tag's name can give away an unannounced post. The sitemap follows the same rule, and so does the category menu (`CategoryNav`) at the top of every listing page. There is deliberately no tag list: tags multiply and most stay thin, so they are reached from posts only.
 - The post page opens with breadcrumbs (Blog › category › post) and a matching `BreadcrumbList` JSON-LD, a second `ld+json` script beside the `Article` one.
+
+### Old URLs Redirect
+
+Posts, categories and tags keep their old paths in one polymorphic table, `blog_redirects`. Each model uses `HasRedirects` (stores and clears the paths) and implements `Redirectable` (`url()` and `isPubliclyVisible()`).
+
+- **What records a path:** any save that changes a page's URL. `HasRedirects` reads the URL from the database row before the save and compares it with the one after, so it never needs to know which fields shape a URL. The one case it cannot see is a category's slug changing its **posts'** URLs without any post being saved; `Category::booted()` records those.
+- **Where it is read:** `Redirect::responseFor()`, called by `BlogController::show()` when no live post matches, and by the category and tag routes' `->missing()` when route-model binding finds no slug. It 301s to the page's **current** URL.
+- A live page always wins: an old path reused by a new post shows the new post.
+- No chains: every stored path points at the page, not at the next path, so a post moved three times redirects its first URL straight to its current one.
+- A path is stored once; whatever left it last takes it over.
+- The target must be publicly visible (a published post, a category or tag with a published post), or the old URL is a 404.
+- Deleting a page deletes its redirects, in `HasRedirects`: a morph has no foreign key to cascade.
 
 ### Post Card Links
 

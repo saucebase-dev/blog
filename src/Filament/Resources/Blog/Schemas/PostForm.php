@@ -92,11 +92,7 @@ class PostForm
                                 ->hiddenLabel()
                                 ->relationship('tags', 'name')
                                 ->multiple()
-                                ->createOptionForm([
-                                    TextInput::make('name')
-                                        ->required()
-                                        ->maxLength(255),
-                                ])
+                                ->createOptionForm(fn (Schema $schema): Schema => TagForm::configure($schema))
                                 ->searchable()
                                 ->preload(),
                         ]),

@@ -7,9 +7,9 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Modules\Blog\Filament\Resources\Blog\PostResource;
-use Modules\Blog\Models\Category;
+use Modules\Blog\Models\Tag;
 
-class CategoriesTable
+class TagsTable
 {
     public static function configure(Table $table): Table
     {
@@ -26,8 +26,8 @@ class CategoriesTable
                     ->label(__('Posts'))
                     ->counts('posts')
                     ->sortable()
-                    ->url(fn (Category $record): string => PostResource::getUrl('index', [
-                        'filters' => ['category' => ['value' => $record->id]],
+                    ->url(fn (Tag $record): string => PostResource::getUrl('index', [
+                        'filters' => ['tags' => ['values' => [$record->id]]],
                     ])),
 
                 TextColumn::make('created_at')

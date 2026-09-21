@@ -233,6 +233,16 @@ class BlogControllerTest extends TestCase
         $this->get(route('blog.tag', 'nope'))->assertNotFound();
     }
 
+    public function test_a_category_or_tag_used_only_by_drafts_is_not_found(): void
+    {
+        $category = Category::factory()->create(['name' => 'Secret launch']);
+        $tag = Tag::factory()->create(['name' => 'secret-launch']);
+        Post::factory()->draft()->hasAttached($tag)->create(['category_id' => $category->id]);
+
+        $this->get(route('blog.category', $category->slug))->assertNotFound();
+        $this->get(route('blog.tag', $tag->slug))->assertNotFound();
+    }
+
     public function test_related_posts_rank_shared_tags_above_newer_posts(): void
     {
         $tag = Tag::factory()->create();

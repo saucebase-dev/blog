@@ -19,6 +19,8 @@ import PostTags from '../components/PostTags.vue';
 const props = defineProps<{
     post: Modules.Blog.Data.PostData;
     related: Modules.Blog.Data.PostData[];
+    /** An admin viewing a post that is not public yet. */
+    preview: boolean;
 }>();
 
 // Inertia's Head renders text children but drops v-html. `<` is escaped so a
@@ -77,6 +79,7 @@ const breadcrumbJsonLd = computed(() =>
         type="article"
     >
         <Head>
+            <meta v-if="preview" name="robots" content="noindex, nofollow" />
             <meta
                 v-if="post.published_at"
                 property="article:published_time"
@@ -95,6 +98,18 @@ const breadcrumbJsonLd = computed(() =>
             }}</component>
         </Head>
         <main class="mx-auto w-full max-w-3xl flex-1 px-6 py-28">
+            <p
+                v-if="preview"
+                data-testid="post-preview-banner"
+                role="status"
+                class="mb-8 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-900 dark:text-amber-200"
+            >
+                {{
+                    $t(
+                        'Preview: this post is not published, and only admins can see it.',
+                    )
+                }}
+            </p>
             <Breadcrumb class="mb-8">
                 <BreadcrumbList>
                     <BreadcrumbItem>
@@ -141,15 +156,8 @@ const breadcrumbJsonLd = computed(() =>
                 {{ post.title }}
             </h1>
 
-            <!-- Meta: category, tags, author, date -->
-            <div class="mb-10 space-y-4">
-                <div class="flex flex-wrap items-center gap-1.5">
-                    <PostCategory
-                        v-if="post.category"
-                        :category="post.category"
-                    />
-                    <PostTags :tags="post.tags" />
-                </div>
+            <!-- Meta: author, date -->
+            <div class="mb-10">
                 <PostMeta
                     :author="post.author"
                     :published-at="post.published_at"
@@ -174,6 +182,32 @@ const breadcrumbJsonLd = computed(() =>
                 class="prose dark:prose-invert max-w-none leading-loose"
                 v-html="post.content"
             />
+
+            <!-- Filed under: after the post, once read, they point to more
+                 on the same topics. -->
+            <div
+                v-if="post.category || post.tags.length > 0"
+                data-testid="post-filed-under"
+                class="border-border mt-12 space-y-3 border-t pt-8"
+            >
+                <div v-if="post.category" class="flex items-center gap-2">
+                    <span class="text-muted-foreground text-sm font-medium"
+                        >{{ $t('Category') }}:</span
+                    >
+                    <PostCategory :category="post.category" />
+                </div>
+                <div
+                    v-if="post.tags.length > 0"
+                    class="flex items-center gap-2"
+                >
+                    <span
+                        class="text-muted-foreground shrink-0 text-sm font-medium"
+                    >
+                        {{ post.tags.length === 1 ? $t('Tag') : $t('Tags') }}:
+                    </span>
+                    <PostTags :tags="post.tags" />
+                </div>
+            </div>
         </main>
 
         <!-- You might also like -->

@@ -25,6 +25,7 @@ Adds `/blog` with posts, categories, tags, cover images and an RSS feed. Write i
 - **Tags** — as many per post as you like, each with its own page
 - **Browse by topic** — a category menu on every listing page
 - **Scheduling** — set a publish date and the post goes live on its own
+- **Draft preview** — see a post on its real page before you publish it
 - **Old links keep working** — change a slug or move a post to another category, and the old URL redirects to the new one
 - **Built for search** — server-rendered pages, meta tags, breadcrumbs, and structured data
 - **RSS feed** — at `/blog/feed`
@@ -71,7 +72,7 @@ Posts are reachable two ways: `/blog/my-post` and `/blog/my-category/my-post`. I
 
 Each category has a page at `/blog/category/my-category`, and each tag at `/blog/tag/my-tag`. A post has one category, which decides its URL, and as many tags as you like, which don't.
 
-Three words are reserved and can't be used as slugs: `category` and `tag` for categories, `feed` for posts.
+Four words are reserved and can't be used as slugs: `category`, `tag` and `preview` for categories, `feed` for posts.
 
 ## Extending
 

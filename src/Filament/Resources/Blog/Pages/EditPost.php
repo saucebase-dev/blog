@@ -16,15 +16,10 @@ class EditPost extends EditRecord
     {
         return [
             Action::make('view_post')
-                ->label(__('View Post'))
+                ->label(fn (Post $record): string => $record->isPubliclyVisible() ? __('View Post') : __('Preview'))
                 ->icon('heroicon-o-arrow-top-right-on-square')
                 ->color('gray')
-                ->url(function (): string {
-                    /** @var Post $post */
-                    $post = $this->getRecord();
-
-                    return $post->url();
-                })
+                ->url(fn (Post $record): string => $record->viewUrl())
                 ->openUrlInNewTab(),
             DeleteAction::make(),
         ];

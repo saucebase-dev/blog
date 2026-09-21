@@ -28,10 +28,18 @@ A post has **one** category, which owns its URL and canonical, and **many** tags
 
 - `/blog/category/{category}` → `blog.category`, `/blog/tag/{tag}` → `blog.tag`. Both render `Blog::Index` through `BlogController::listing()`, the same method as the blog index, with a `heading` prop the index leaves `null`. The canonical comes from the paginator's `path`, so one page serves all three.
 - They sit under `category/` and `tag/` rather than at `/blog/{category}` so they cannot collide with an uncategorised post at `/blog/{slug}`.
-- Registered **above** `/blog/{category}/{slug}`, which would otherwise swallow them. That makes `category` and `tag` unusable as category slugs, and `feed` as a post slug: `Category::RESERVED_SLUGS` / `Post::RESERVED_SLUGS` are fed to Sluggable (a generated slug gets a suffix) and to the Filament forms' `notIn()` (a typed one is rejected).
+- Registered **above** `/blog/{category}/{slug}`, which would otherwise swallow them. That makes `category`, `tag` and `preview` unusable as category slugs, and `feed` as a post slug: `Category::RESERVED_SLUGS` / `Post::RESERVED_SLUGS` are fed to Sluggable (a generated slug gets a suffix) and to the Filament forms' `notIn()` (a typed one is rejected).
 - Related posts rank: same category, then most shared tags, then newest. The rule is `Post::relatedPosts()`; the controller only adds eager loads and the limit.
 - A category or tag page is a 404 unless it has a published post: a draft-only tag's name can give away an unannounced post. The sitemap follows the same rule, and so does the category menu (`CategoryNav`) at the top of every listing page. There is deliberately no tag list: tags multiply and most stay thin, so they are reached from posts only.
 - The post page opens with breadcrumbs (Blog › category › post) and a matching `BreadcrumbList` JSON-LD, a second `ld+json` script beside the `Article` one.
+
+### Draft Preview
+
+`/blog/preview/{post}` (`blog.preview`, by ID) renders any post, published or not, on the real `Blog::Show` page for an admin (`User::isAdmin()`, the same check as panel access), with a `preview` prop that adds a banner and `noindex`. Everyone else gets a **404**, not a 403, so the link does not confirm the draft exists. It is a separate route rather than a flag on the public URL, so the public route's rules (published only, redirects) stay untouched.
+
+`Post::viewUrl()` picks the public URL once the post is live and the preview until then; the admin's *View Post* / *Preview* action uses it. It relies on `Post::isPubliclyVisible()`, which checks the post's own fields without a query because the posts table asks it for every row, so it must match `scopePublished()`.
+
+`preview` is a reserved category slug, as `/blog/preview/{post}` is matched before `/blog/{category}/{slug}`.
 
 ### Old URLs Redirect
 

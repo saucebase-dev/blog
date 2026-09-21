@@ -18,9 +18,11 @@ import PostTags from '../components/PostTags';
 interface ShowProps {
     post: Modules.Blog.Data.PostData;
     related: Modules.Blog.Data.PostData[];
+    /** An admin viewing a post that is not public yet. */
+    preview: boolean;
 }
 
-export default function Show({ post, related }: ShowProps) {
+export default function Show({ post, related, preview }: ShowProps) {
     const t = useT();
 
     const jsonLd = {
@@ -69,6 +71,7 @@ export default function Show({ post, related }: ShowProps) {
             type="article"
         >
             <Head>
+                {preview && <meta name="robots" content="noindex, nofollow" />}
                 {post.published_at && (
                     <meta
                         property="article:published_time"
@@ -98,6 +101,17 @@ export default function Show({ post, related }: ShowProps) {
                 />
             </Head>
             <main className="mx-auto w-full max-w-3xl flex-1 px-6 py-28">
+                {preview && (
+                    <p
+                        data-testid="post-preview-banner"
+                        role="status"
+                        className="mb-8 rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-900 dark:text-amber-200"
+                    >
+                        {t(
+                            'Preview: this post is not published, and only admins can see it.',
+                        )}
+                    </p>
+                )}
                 <Breadcrumb className="mb-8">
                     <BreadcrumbList>
                         <BreadcrumbItem>
@@ -143,13 +157,7 @@ export default function Show({ post, related }: ShowProps) {
                     {post.title}
                 </h1>
 
-                <div className="mb-10 space-y-4">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                        {post.category && (
-                            <PostCategory category={post.category} />
-                        )}
-                        <PostTags tags={post.tags} />
-                    </div>
+                <div className="mb-10">
                     <PostMeta
                         author={post.author}
                         publishedAt={post.published_at}
@@ -171,6 +179,35 @@ export default function Show({ post, related }: ShowProps) {
                     className="prose dark:prose-invert max-w-none leading-loose"
                     dangerouslySetInnerHTML={{ __html: post.content ?? '' }}
                 />
+
+                {/* Filed under: after the post, once read, they point to more
+                    on the same topics. */}
+                {(post.category || post.tags.length > 0) && (
+                    <div
+                        data-testid="post-filed-under"
+                        className="border-border mt-12 space-y-3 border-t pt-8"
+                    >
+                        {post.category && (
+                            <div className="flex items-center gap-2">
+                                <span className="text-muted-foreground text-sm font-medium">
+                                    {t('Category')}:
+                                </span>
+                                <PostCategory category={post.category} />
+                            </div>
+                        )}
+                        {post.tags.length > 0 && (
+                            <div className="flex items-center gap-2">
+                                <span className="text-muted-foreground shrink-0 text-sm font-medium">
+                                    {post.tags.length === 1
+                                        ? t('Tag')
+                                        : t('Tags')}
+                                    :
+                                </span>
+                                <PostTags tags={post.tags} />
+                            </div>
+                        )}
+                    </div>
+                )}
             </main>
 
             {related.length > 0 && (

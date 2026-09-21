@@ -71,10 +71,10 @@ class PostsTable
             ])
             ->recordActions([
                 ViewAction::make('view_post')
-                    ->label(__('View Post'))
+                    ->label(fn (Post $record): string => $record->isPubliclyVisible() ? __('View Post') : __('Preview'))
                     ->icon('heroicon-o-arrow-top-right-on-square')
                     ->color('gray')
-                    ->url(fn (Post $record): string => $record->url())
+                    ->url(fn (Post $record): string => $record->viewUrl())
                     ->openUrlInNewTab(),
                 EditAction::make(),
             ])

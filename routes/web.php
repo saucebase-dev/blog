@@ -14,6 +14,7 @@ Route::middleware('web')->group(function (): void {
         ->missing(fn (Request $request) => Redirect::responseFor($request));
     Route::get('/blog/tag/{tag:slug}', [BlogController::class, 'tag'])->name('blog.tag')
         ->missing(fn (Request $request) => Redirect::responseFor($request));
+    Route::get('/blog/preview/{post}', [BlogController::class, 'preview'])->name('blog.preview');
     Route::get('/blog/{category}/{slug}', [BlogController::class, 'show'])->name('blog.show.category');
     Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 });

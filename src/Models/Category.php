@@ -26,10 +26,10 @@ class Category extends Model implements Redirectable, Sitemapable
 
     /**
      * Slugs a category cannot take: its posts live at `/blog/{category}/{post}`,
-     * and these two words already begin the tag and category page URLs, which are
+     * and these words already begin the category, tag and preview URLs, which are
      * matched first.
      */
-    public const RESERVED_SLUGS = ['category', 'tag'];
+    public const RESERVED_SLUGS = ['category', 'tag', 'preview'];
 
     protected static function booted(): void
     {

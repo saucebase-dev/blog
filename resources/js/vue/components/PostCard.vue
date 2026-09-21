@@ -36,7 +36,9 @@ defineProps<{
         </div>
 
         <div class="flex flex-1 flex-col gap-3 px-1 pt-4 pb-2">
-            <PostCategory v-if="post.category" :category="post.category" />
+            <div v-if="post.category">
+                <PostCategory :category="post.category" />
+            </div>
 
             <!-- The title's link stretches over the whole card, so the card
                  still opens the post without wrapping the category and tag

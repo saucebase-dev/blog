@@ -96,7 +96,7 @@ const canonical = computed(() =>
                         :href="posts.prev_page_url"
                         class="bg-card text-card-foreground ring-border hover:bg-accent mt-8 cursor-pointer rounded-xl px-4 py-3 font-semibold shadow-lg ring-1 transition-all duration-200 ring-inset focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
                     >
-                        {{ $t('← Previous') }}
+                        {{ $t('← Newer posts') }}
                     </Link>
                     <Link
                         v-if="posts.next_page_url"
@@ -104,7 +104,7 @@ const canonical = computed(() =>
                         :href="posts.next_page_url"
                         class="bg-card text-card-foreground ring-border hover:bg-accent mt-8 cursor-pointer rounded-xl px-4 py-3 font-semibold shadow-lg ring-1 transition-all duration-200 ring-inset focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
                     >
-                        {{ $t('Next →') }}
+                        {{ $t('Older posts →') }}
                     </Link>
                 </div>
             </main>

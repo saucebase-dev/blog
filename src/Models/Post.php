@@ -140,9 +140,23 @@ class Post extends Model implements Feedable, HasMedia, Redirectable, Sitemapabl
             : route('blog.show', $this->slug);
     }
 
+    /**
+     * `scopePublished()` for a post already in memory, without a query: the posts
+     * table asks every row. Change the two together.
+     */
     public function isPubliclyVisible(): bool
     {
-        return static::published()->whereKey($this->id)->exists();
+        return $this->status === PostStatus::Published
+            && ($this->published_at === null || $this->published_at->isPast());
+    }
+
+    /**
+     * Where an admin views the post: its public page once it is live, the
+     * preview until then.
+     */
+    public function viewUrl(): string
+    {
+        return $this->isPubliclyVisible() ? $this->url() : route('blog.preview', $this);
     }
 
     /**

@@ -96,6 +96,19 @@ class BlogController
         );
     }
 
+    /**
+     * Any post, published or not, on its real page, for whoever can edit it.
+     *
+     * A 404 for everyone else rather than a 403, so the link does not even
+     * confirm that the draft exists.
+     */
+    public function preview(Request $request, Post $post): Response
+    {
+        abort_unless($request->user()?->isAdmin(), 404);
+
+        return $this->render($post->load(['category', 'tags', 'author']), preview: true);
+    }
+
     public function show(Request $request, string $categoryOrSlug, ?string $slug = null): Response|RedirectResponse
     {
         $query = Post::published()->with(['category', 'tags', 'author']);
@@ -108,6 +121,14 @@ class BlogController
             return Redirect::responseFor($request);
         }
 
+        return $this->render($post);
+    }
+
+    /**
+     * @param  bool  $preview  shown to an admin before the post is public: marked as such and kept out of search
+     */
+    private function render(Post $post, bool $preview = false): Response
+    {
         $related = $post->relatedPosts()
             ->with(['category', 'tags', 'author'])
             ->limit(3)
@@ -117,6 +138,7 @@ class BlogController
         return Inertia::render('Blog::Show', [
             'post' => PostData::fromPost($post)->withContent(Str::sanitizeHtml($post->content)),
             'related' => $related,
+            'preview' => $preview,
         ])->withSSR();
     }
 }

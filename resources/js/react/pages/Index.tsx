@@ -84,7 +84,7 @@ export default function Index({
                                     data-testid="pagination-previous"
                                     className={paginationClass}
                                 >
-                                    {t('← Previous')}
+                                    {t('← Newer posts')}
                                 </Link>
                             )}
                             {posts.next_page_url && (
@@ -93,7 +93,7 @@ export default function Index({
                                     data-testid="pagination-next"
                                     className={paginationClass}
                                 >
-                                    {t('Next →')}
+                                    {t('Older posts →')}
                                 </Link>
                             )}
                         </div>

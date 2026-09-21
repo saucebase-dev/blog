@@ -11,7 +11,7 @@ export default function PostCategory({
         <Link
             href={route('blog.category', category.slug)}
             data-testid="post-category-link"
-            className="bg-secondary/80 text-secondary-foreground/80 hover:bg-secondary relative z-10 self-start rounded-full px-2.5 py-1 text-xs font-semibold transition-colors"
+            className="bg-secondary/80 text-secondary-foreground/80 hover:bg-secondary relative z-10 rounded-full px-2.5 py-1 text-xs font-semibold transition-colors"
         >
             {category.name}
         </Link>

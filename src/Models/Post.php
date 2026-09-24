@@ -191,7 +191,9 @@ class Post extends Model implements Feedable, HasMedia, Redirectable, Sitemapabl
 
     /**
      * Other published posts, closest first: same category, then most tags in
-     * common, then newest.
+     * common, then newest. A `CASE` rather than `category_id = ?`: a post with
+     * no category makes that NULL, which PostgreSQL sorts first. The ID breaks
+     * ties, so every database returns the same order.
      *
      * @return Builder<Post>
      */
@@ -200,9 +202,10 @@ class Post extends Model implements Feedable, HasMedia, Redirectable, Sitemapabl
         return static::published()
             ->whereKeyNot($this->id)
             ->withCount(['tags as shared_tags_count' => fn (Builder $tags) => $tags->whereIn('blog_tags.id', $this->tags->modelKeys())])
-            ->when($this->category_id, fn (Builder $query, int $categoryId) => $query->orderByRaw('category_id = ? desc', [$categoryId]))
+            ->when($this->category_id, fn (Builder $query, int $categoryId) => $query->orderByRaw('case when category_id = ? then 0 else 1 end', [$categoryId]))
             ->orderByDesc('shared_tags_count')
-            ->orderByDesc('published_at');
+            ->orderByDesc('published_at')
+            ->orderByDesc('id');
     }
 
     public function scopePublished(Builder $query): Builder

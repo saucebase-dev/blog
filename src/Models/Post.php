@@ -186,7 +186,7 @@ class Post extends Model implements Feedable, HasMedia, Redirectable, Sitemapabl
             ->summary($this->excerpt ?? Str::limit(strip_tags($this->content), 300))
             ->updated($this->published_at ?? $this->updated_at)
             ->link($this->url())
-            ->authorName($this->author?->name ?? '');
+            ->authorName($this->author->name ?? '');
     }
 
     /**

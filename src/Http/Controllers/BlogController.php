@@ -104,7 +104,7 @@ class BlogController
      */
     public function preview(Request $request, Post $post): Response
     {
-        abort_unless($request->user()?->isAdmin(), 404);
+        abort_unless($request->user()?->can('access admin panel'), 404);
 
         return $this->render($post->load(['category', 'tags', 'author']), preview: true);
     }

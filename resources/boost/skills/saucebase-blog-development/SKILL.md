@@ -40,7 +40,7 @@ A post has **one** category, which owns its URL and canonical, and **many** tags
 
 ### Draft Preview
 
-`/blog/preview/{post}` (`blog.preview`, by ID) renders any post, published or not, on the real `Blog::Show` page for an admin (`User::isAdmin()`, the same check as panel access), with a `preview` prop that adds a banner and `noindex`. Everyone else gets a **404**, not a 403, so the link does not confirm the draft exists. It is a separate route rather than a flag on the public URL, so the public route's rules (published only, redirects) stay untouched.
+`/blog/preview/{post}` (`blog.preview`, by ID) renders any post, published or not, on the real `Blog::Show` page for anyone with the `access admin panel` permission (the same check as panel access), with a `preview` prop that adds a banner and `noindex`. Everyone else gets a **404**, not a 403, so the link does not confirm the draft exists. It is a separate route rather than a flag on the public URL, so the public route's rules (published only, redirects) stay untouched.
 
 `Post::viewUrl()` picks the public URL once the post is live and the preview until then; the admin's *View Post* / *Preview* action uses it. It relies on `Post::isPubliclyVisible()`, which checks the post's own fields without a query because the posts table asks it for every row, so it must match `scopePublished()`.
 

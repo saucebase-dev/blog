@@ -2,7 +2,6 @@
 
 namespace Modules\Blog\Tests\Feature;
 
-use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -26,7 +25,7 @@ class PostResourceTest extends TestCase
         parent::setUp();
 
         $this->admin = User::factory()->create(['email_verified_at' => now()]);
-        $this->admin->assignRole(Role::ADMIN);
+        $this->admin->assignRole('admin');
     }
 
     public function test_admin_can_list_posts(): void

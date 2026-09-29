@@ -2,7 +2,6 @@
 
 namespace Modules\Blog\Tests\Feature;
 
-use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -22,7 +21,7 @@ class PostPreviewTest extends TestCase
         parent::setUp();
 
         $this->admin = User::factory()->create(['email_verified_at' => now()]);
-        $this->admin->assignRole(Role::ADMIN);
+        $this->admin->assignRole('admin');
     }
 
     public function test_an_admin_can_preview_a_draft(): void
@@ -51,7 +50,7 @@ class PostPreviewTest extends TestCase
     {
         $draft = Post::factory()->draft()->create();
         $user = User::factory()->create(['email_verified_at' => now()]);
-        $user->assignRole(Role::USER);
+        $user->assignRole('user');
 
         $this->get(route('blog.preview', $draft))->assertNotFound();
         $this->actingAs($user)->get(route('blog.preview', $draft))->assertNotFound();

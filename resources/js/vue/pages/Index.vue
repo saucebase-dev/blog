@@ -25,6 +25,9 @@ const description = computed(
         trans('Tips, insights, and updates from our team.'),
 );
 
+const paginationClass =
+    'bg-card text-card-foreground ring-border hover:bg-accent mt-8 cursor-pointer rounded-xl px-4 py-3 font-semibold shadow-lg ring-1 transition-all duration-200 ring-inset focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2';
+
 const canonical = computed(() =>
     props.posts.current_page > 1
         ? `${props.posts.path}?page=${props.posts.current_page}`
@@ -74,10 +77,7 @@ const canonical = computed(() =>
                 </div>
 
                 <!-- Post grid -->
-                <div
-                    v-else
-                    class="grid grid-cols-1 gap-8 sm:grid-cols-1 lg:grid-cols-2"
-                >
+                <div v-else class="grid grid-cols-1 gap-8 lg:grid-cols-2">
                     <PostCard
                         v-for="post in posts.data"
                         :key="post.id"
@@ -94,7 +94,7 @@ const canonical = computed(() =>
                         v-if="posts.prev_page_url"
                         data-testid="pagination-previous"
                         :href="posts.prev_page_url"
-                        class="bg-card text-card-foreground ring-border hover:bg-accent mt-8 cursor-pointer rounded-xl px-4 py-3 font-semibold shadow-lg ring-1 transition-all duration-200 ring-inset focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
+                        :class="paginationClass"
                     >
                         {{ $t('← Newer posts') }}
                     </Link>
@@ -102,7 +102,7 @@ const canonical = computed(() =>
                         v-if="posts.next_page_url"
                         data-testid="pagination-next"
                         :href="posts.next_page_url"
-                        class="bg-card text-card-foreground ring-border hover:bg-accent mt-8 cursor-pointer rounded-xl px-4 py-3 font-semibold shadow-lg ring-1 transition-all duration-200 ring-inset focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2"
+                        :class="paginationClass"
                     >
                         {{ $t('Older posts →') }}
                     </Link>

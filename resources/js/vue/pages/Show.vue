@@ -25,8 +25,11 @@ const props = defineProps<{
 
 // Inertia's Head renders text children but drops v-html. `<` is escaped so a
 // title containing a closing script tag cannot end the JSON-LD block.
+const toJsonLd = (data: object) =>
+    JSON.stringify(data).replaceAll('<', '\\u003c');
+
 const jsonLd = computed(() =>
-    JSON.stringify({
+    toJsonLd({
         '@context': 'https://schema.org',
         '@type': 'Article',
         headline: props.post.title,
@@ -38,13 +41,13 @@ const jsonLd = computed(() =>
             ? { '@type': 'Person', name: props.post.author.name }
             : undefined,
         url: props.post.url,
-    }).replaceAll('<', '\\u003c'),
+    }),
 );
 
 // The same trail as the visible breadcrumbs, which search results can show in
 // place of the raw URL.
 const breadcrumbJsonLd = computed(() =>
-    JSON.stringify({
+    toJsonLd({
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
         itemListElement: [
@@ -66,7 +69,7 @@ const breadcrumbJsonLd = computed(() =>
             position: index + 1,
             ...crumb,
         })),
-    }).replaceAll('<', '\\u003c'),
+    }),
 );
 </script>
 

@@ -63,7 +63,7 @@ class BlogController
             'posts' => $posts->through(fn (Post $post) => PostData::fromPost($post)),
             'heading' => $heading,
             // Only categories with something to read, the same rule the sitemap uses.
-            'categories' => Category::whereHas('posts', fn ($posts) => $posts->published())
+            'categories' => Category::withPublishedPosts()
                 ->orderBy('name')
                 ->get()
                 ->map(fn (Category $category) => CategoryData::from($category)),
@@ -136,7 +136,7 @@ class BlogController
             ->map(fn (Post $p) => PostData::fromPost($p));
 
         return Inertia::render('Blog::Show', [
-            'post' => PostData::fromPost($post)->withContent(Str::sanitizeHtml($post->content)),
+            'post' => PostData::fromPost($post, content: Str::sanitizeHtml($post->content)),
             'related' => $related,
             'preview' => $preview,
         ])->withSSR();

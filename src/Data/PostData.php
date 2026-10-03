@@ -27,7 +27,8 @@ final class PostData extends Data
         public ?string $content = null,
     ) {}
 
-    public static function fromPost(Post $post): static
+    /** @param  string|null  $content  sanitized HTML, sent only to the post's own page */
+    public static function fromPost(Post $post, ?string $content = null): static
     {
         $cover = $post->getFirstMedia('cover');
 
@@ -46,24 +47,6 @@ final class PostData extends Data
             tags: $post->tags->map(fn (Tag $tag) => TagData::from($tag))->all(),
             author: $post->author ? AuthorData::from($post->author) : null,
             url: $post->url(),
-        );
-    }
-
-    public function withContent(string $content): static
-    {
-        return new self(
-            id: $this->id,
-            title: $this->title,
-            slug: $this->slug,
-            excerpt: $this->excerpt,
-            cover_url: $this->cover_url,
-            card_url: $this->card_url,
-            published_at: $this->published_at,
-            updated_at: $this->updated_at,
-            category: $this->category,
-            tags: $this->tags,
-            author: $this->author,
-            url: $this->url,
             content: $content,
         );
     }

@@ -3,6 +3,7 @@
 namespace Modules\Blog\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -71,6 +72,15 @@ class Category extends Model implements Redirectable, Sitemapable
     public function isPubliclyVisible(): bool
     {
         return $this->posts()->published()->exists();
+    }
+
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    public function scopeWithPublishedPosts(Builder $query): Builder
+    {
+        return $query->whereHas('posts', fn (Builder $posts) => $posts->published());
     }
 
     public function toSitemapTag(): Url

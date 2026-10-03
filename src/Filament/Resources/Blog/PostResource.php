@@ -2,6 +2,7 @@
 
 namespace Modules\Blog\Filament\Resources\Blog;
 
+use Filament\Actions\Action;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -32,9 +33,15 @@ class PostResource extends Resource
         return PostsTable::configure($table);
     }
 
-    public static function getRelations(): array
+    /** Opens the post's public page once it is live, the preview until then. */
+    public static function viewPostAction(): Action
     {
-        return [];
+        return Action::make('view_post')
+            ->label(fn (Post $record): string => $record->isPubliclyVisible() ? __('View Post') : __('Preview'))
+            ->icon('heroicon-o-arrow-top-right-on-square')
+            ->color('gray')
+            ->url(fn (Post $record): string => $record->viewUrl())
+            ->openUrlInNewTab();
     }
 
     public static function getPages(): array

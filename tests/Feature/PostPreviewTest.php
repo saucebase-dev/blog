@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Filament\Resources\Blog\Pages\EditPost;
+use Modules\Blog\Filament\Resources\Blog\Pages\ListPosts;
 use Modules\Blog\Models\Post;
 use Tests\TestCase;
 
@@ -77,5 +78,17 @@ class PostPreviewTest extends TestCase
 
         Livewire::test(EditPost::class, ['record' => $post->id])
             ->assertActionHasUrl('view_post', $post->url());
+    }
+
+    public function test_the_posts_list_view_action_opens_the_preview_until_the_post_is_live(): void
+    {
+        $draft = Post::factory()->draft()->create(['category_id' => null]);
+        $live = Post::factory()->published()->create(['category_id' => null]);
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(ListPosts::class)
+            ->assertTableActionHasUrl('view_post', route('blog.preview', $draft), $draft)
+            ->assertTableActionHasUrl('view_post', $live->url(), $live);
     }
 }

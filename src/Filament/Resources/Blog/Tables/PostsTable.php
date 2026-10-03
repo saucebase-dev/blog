@@ -4,13 +4,12 @@ namespace Modules\Blog\Filament\Resources\Blog\Tables;
 
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Modules\Blog\Enums\PostStatus;
-use Modules\Blog\Models\Post;
+use Modules\Blog\Filament\Resources\Blog\PostResource;
 
 class PostsTable
 {
@@ -70,12 +69,7 @@ class PostsTable
                     ->preload(),
             ])
             ->recordActions([
-                ViewAction::make('view_post')
-                    ->label(fn (Post $record): string => $record->isPubliclyVisible() ? __('View Post') : __('Preview'))
-                    ->icon('heroicon-o-arrow-top-right-on-square')
-                    ->color('gray')
-                    ->url(fn (Post $record): string => $record->viewUrl())
-                    ->openUrlInNewTab(),
+                PostResource::viewPostAction(),
                 EditAction::make(),
             ])
             ->toolbarActions([

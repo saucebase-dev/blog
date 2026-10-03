@@ -243,6 +243,17 @@ class BlogControllerTest extends TestCase
         $this->get(route('blog.tag', $tag->slug))->assertNotFound();
     }
 
+    public function test_only_categories_and_tags_with_published_posts_are_public(): void
+    {
+        [$live, $hidden] = Category::factory()->count(2)->create();
+        [$liveTag, $hiddenTag] = Tag::factory()->count(2)->create();
+        Post::factory()->published()->hasAttached($liveTag)->create(['category_id' => $live->id]);
+        Post::factory()->draft()->hasAttached($hiddenTag)->create(['category_id' => $hidden->id]);
+
+        $this->assertEquals([$live->id], Category::withPublishedPosts()->pluck('id')->all());
+        $this->assertEquals([$liveTag->id], Tag::withPublishedPosts()->pluck('id')->all());
+    }
+
     public function test_related_posts_rank_shared_tags_above_newer_posts(): void
     {
         $tag = Tag::factory()->create();

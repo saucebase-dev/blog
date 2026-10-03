@@ -4,9 +4,7 @@ namespace Modules\Blog\Enums;
 
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
-use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-#[TypeScript]
 enum PostStatus: string implements HasColor, HasLabel
 {
     case Draft = 'draft';

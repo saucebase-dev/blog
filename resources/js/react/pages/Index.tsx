@@ -69,7 +69,7 @@ export default function Index({
                             </p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 gap-8 sm:grid-cols-1 lg:grid-cols-2">
+                        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                             {posts.data.map((post) => (
                                 <PostCard key={post.id} post={post} />
                             ))}

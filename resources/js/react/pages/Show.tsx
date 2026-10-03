@@ -22,6 +22,11 @@ interface ShowProps {
     preview: boolean;
 }
 
+// `<` is escaped so a title containing a closing script tag cannot end the
+// JSON-LD block.
+const toJsonLd = (data: object) =>
+    JSON.stringify(data).replace(/</g, '\\u003c');
+
 export default function Show({ post, related, preview }: ShowProps) {
     const t = useT();
 
@@ -87,16 +92,13 @@ export default function Show({ post, related, preview }: ShowProps) {
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{
-                        __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c'),
+                        __html: toJsonLd(jsonLd),
                     }}
                 />
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{
-                        __html: JSON.stringify(breadcrumbJsonLd).replace(
-                            /</g,
-                            '\\u003c',
-                        ),
+                        __html: toJsonLd(breadcrumbJsonLd),
                     }}
                 />
             </Head>

@@ -15,10 +15,13 @@ class BlogServiceProvider extends ModuleServiceProvider
     {
         parent::boot();
 
-        $this->app->make(SitemapRegistry::class)->add(fn (Sitemap $sitemap) => $sitemap
-            ->add(route('blog.index'))
-            ->add(Post::published()->with('category')->get())
-            ->add(Category::whereHas('posts', fn ($posts) => $posts->published())->get())
-            ->add(Tag::whereHas('posts', fn ($posts) => $posts->published())->get()));
+        $this->app->make(SitemapRegistry::class)
+            ->add(
+                fn (Sitemap $sitemap) => $sitemap
+                    ->add(route('blog.index'))
+                    ->add(Post::published()->with('category')->get())
+                    ->add(Category::whereHas('posts', fn ($posts) => $posts->published())->get())
+                    ->add(Tag::whereHas('posts', fn ($posts) => $posts->published())->get())
+            );
     }
 }

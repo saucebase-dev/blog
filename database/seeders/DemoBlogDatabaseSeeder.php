@@ -8,12 +8,19 @@ use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
 use Modules\Blog\Models\Tag;
+use Spatie\Permission\Models\Role;
 
 class DemoBlogDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $author = User::first();
+        // A staff account that sees only the blog admin, and writes the demo posts.
+        Role::findOrCreate('blog admin')->syncPermissions(['access admin panel', 'manage blog']);
+        $author = User::firstOrCreate(
+            ['email' => 'blog@saucebase.dev'],
+            ['name' => 'Blog Admin', 'password' => bcrypt('secretsauce')],
+        );
+        $author->syncRoles('blog admin');
 
         $gettingStarted = Category::firstOrCreate(['name' => 'Getting Started']);
         $featuresModules = Category::firstOrCreate(['name' => 'Features & Modules']);
@@ -29,7 +36,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subMonths(5),
             'category_id' => $gettingStarted->id,
-            'author_id' => $author?->id,
+            'author_id' => $author->id,
         ], $image('what-is-saucebase.jpg'), ['Laravel', 'SaaS']);
 
         $this->createPost([
@@ -39,7 +46,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subMonths(4),
             'category_id' => $gettingStarted->id,
-            'author_id' => $author?->id,
+            'author_id' => $author->id,
         ], tags: ['Laravel', 'Productivity']);
 
         $this->createPost([
@@ -49,7 +56,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subMonths(3),
             'category_id' => $devExperience->id,
-            'author_id' => $author?->id,
+            'author_id' => $author->id,
         ], $image('tech-stack.jpg'), ['Laravel', 'Inertia', 'Vue', 'React', 'Tailwind']);
 
         $this->createPost([
@@ -59,7 +66,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subMonths(2),
             'category_id' => $featuresModules->id,
-            'author_id' => $author?->id,
+            'author_id' => $author->id,
         ], $image('add-your-saucebase.jpg'), ['Modules', 'Tutorial']);
 
         $this->createPost([
@@ -69,7 +76,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subMonth(),
             'category_id' => $featuresModules->id,
-            'author_id' => $author?->id,
+            'author_id' => $author->id,
         ], $image('cookies-or-privacy.jpg'), ['Modules', 'SaaS', 'Stripe']);
 
         $this->createPost([
@@ -79,7 +86,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subWeeks(2),
             'category_id' => $devExperience->id,
-            'author_id' => $author?->id,
+            'author_id' => $author->id,
         ], $image('your-recipes.jpg'), ['Modules']);
 
         $this->createPost([
@@ -89,7 +96,7 @@ class DemoBlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subDays(3),
             'category_id' => $devExperience->id,
-            'author_id' => $author?->id,
+            'author_id' => $author->id,
         ], $image('vue-and-react.jpg'), ['Vue', 'React', 'Inertia']);
     }
 

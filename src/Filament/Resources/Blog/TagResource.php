@@ -22,6 +22,11 @@ class TagResource extends Resource
 
     protected static bool $shouldRegisterNavigation = false;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('manage blog') ?? false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return TagForm::configure($schema);

@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useTranslation } from '@/i18n';
-import { formatDate } from '@js/lib/dates';
+import { formatDate } from '@saucebase/core/lib/dates';
 
 interface PostMetaProps {
     author: Modules.Blog.Data.AuthorData | null;

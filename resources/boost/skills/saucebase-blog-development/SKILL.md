@@ -88,7 +88,7 @@ The route must stay **above** `/blog/{slug}` in `routes/web.php`, or the catch-a
 
 ### Dates
 
-`published_at` is sent as a date string (`2025-04-19`). `PostMeta` formats it with the app's `formatDate()` (`@js/lib/dates`), which formats in UTC so it shows the same day on the server render and in every browser time zone.
+`published_at` is sent as a date string (`2025-04-19`). `PostMeta` formats it with the app's `formatDate()` (`@saucebase/core/lib/dates`), which formats in UTC so it shows the same day on the server render and in every browser time zone.
 
 ---
 

@@ -1,4 +1,4 @@
-import { registerIcon } from '@/lib/navigation';
+import { registerIcon } from '@saucebase/react/lib/navigation';
 import IconBlog from '~icons/heroicons/newspaper';
 
 export function setup() {

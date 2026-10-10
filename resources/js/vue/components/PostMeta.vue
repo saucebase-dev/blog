@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useLocalization } from '@/composables/useLocalization';
-import { formatDate } from '@js/lib/dates';
+import { formatDate } from '@saucebase/core/lib/dates';
 
 defineProps<{
     author: Modules.Blog.Data.AuthorData | null;

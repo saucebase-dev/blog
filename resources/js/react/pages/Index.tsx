@@ -1,7 +1,7 @@
 import { PageHero } from '@/components/ui/saucebase';
-import { useT } from '@/i18n';
 import SiteLayout from '@/layouts/SiteLayout';
 import { Head, Link } from '@inertiajs/react';
+import { useT } from '@saucebase/react/i18n';
 
 import type { ListingHeading, PaginatedPosts } from '../../types';
 import CategoryNav from '../components/CategoryNav';

@@ -1,5 +1,5 @@
-import { useT } from '@/i18n';
 import { Link } from '@inertiajs/react';
+import { useT } from '@saucebase/react/i18n';
 
 import PostCard from './PostCard';
 

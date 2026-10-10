@@ -1,6 +1,6 @@
-import { useT } from '@/i18n';
 import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
+import { useT } from '@saucebase/react/i18n';
 
 const base = 'rounded-full px-3 py-1.5 text-sm font-medium transition-colors';
 const idle = 'bg-muted text-muted-foreground hover:text-foreground';

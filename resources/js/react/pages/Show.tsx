@@ -6,9 +6,9 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { useT } from '@/i18n';
 import SiteLayout from '@/layouts/SiteLayout';
 import { Head, Link } from '@inertiajs/react';
+import { useT } from '@saucebase/react/i18n';
 
 import PostCard from '../components/PostCard';
 import PostCategory from '../components/PostCategory';

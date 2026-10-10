@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useLocalization } from '@/composables/useLocalization';
+import { useLocalization } from '@saucebase/vue/composables/useLocalization';
 import { formatDate } from '@saucebase/core/lib/dates';
 
 defineProps<{

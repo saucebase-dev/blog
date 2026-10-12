@@ -3,8 +3,10 @@
 namespace Modules\Blog\Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Models\Category;
@@ -93,6 +95,23 @@ class BlogControllerTest extends TestCase
 
         $this->assertCount(1, $images);
         $this->assertSame($post->title, $images[0]->caption);
+    }
+
+    public function test_listings_load_the_cover_images_in_one_query(): void
+    {
+        Post::factory()->published()->count(3)->create();
+
+        $mediaQueries = 0;
+        DB::listen(function (QueryExecuted $query) use (&$mediaQueries): void {
+            $mediaQueries += (int) preg_match('/from .media./', $query->sql);
+        });
+
+        $this->get(route('blog.index'))->assertOk();
+        $this->assertSame(1, $mediaQueries);
+
+        $mediaQueries = 0;
+        $this->get('/sitemap.xml')->assertOk();
+        $this->assertSame(1, $mediaQueries);
     }
 
     public function test_index_returns_paginated_response(): void

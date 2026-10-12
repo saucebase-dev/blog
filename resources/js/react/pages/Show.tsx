@@ -25,7 +25,7 @@ interface ShowProps {
 // `<` is escaped so a title containing a closing script tag cannot end the
 // JSON-LD block.
 const toJsonLd = (data: object) =>
-    JSON.stringify(data).replace(/</g, '\\u003c');
+    JSON.stringify(data).replaceAll('<', String.raw`\u003c`);
 
 export default function Show({ post, related, preview }: ShowProps) {
     const t = useT();

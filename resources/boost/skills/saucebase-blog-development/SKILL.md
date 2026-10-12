@@ -54,7 +54,7 @@ One permission, `manage blog`, covers the whole admin area: `PostResource`, `Cat
 
 Posts, categories and tags keep their old paths in one polymorphic table, `blog_redirects`. Each model uses `HasRedirects` (stores and clears the paths) and implements `Redirectable` (`url()` and `isPubliclyVisible()`).
 
-- **What records a path:** any save that changes a page's URL. `HasRedirects` reads the URL from the database row before the save and compares it with the one after, so it never needs to know which fields shape a URL. The one case it cannot see is a category's slug changing its **posts'** URLs without any post being saved; `Category::booted()` records those.
+- **What records a path:** any save that changes a page's URL. `HasRedirects` reads the URL from the database row before the save and compares it with the one after, so it never needs to know which fields shape a URL. The one case it cannot see is a category changing its **posts'** URLs without any post being saved, when its slug changes or it is deleted; `Category::booted()` records those.
 - **Where it is read:** `Redirect::responseFor()`, called by `BlogController::show()` when no live post matches, and by the category and tag routes' `->missing()` when route-model binding finds no slug. It 301s to the page's **current** URL.
 - A live page always wins: an old path reused by a new post shows the new post.
 - No chains: every stored path points at the page, not at the next path, so a post moved three times redirects its first URL straight to its current one.

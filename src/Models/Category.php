@@ -43,6 +43,13 @@ class Category extends Model implements Redirectable, Sitemapable
                 }
             }
         });
+
+        // Its posts fall back to `/blog/{post}`, again without being saved.
+        static::deleting(function (Category $category): void {
+            foreach ($category->posts as $post) {
+                $post->rememberPath(Post::pathFor($category->slug, $post->slug));
+            }
+        });
     }
 
     /**

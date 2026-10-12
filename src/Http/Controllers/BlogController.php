@@ -55,7 +55,7 @@ class BlogController
     private function listing(Builder $posts, ?array $heading = null, ?Category $activeCategory = null): Response
     {
         $posts = $posts
-            ->with(['category', 'tags', 'author'])
+            ->with(['category', 'tags', 'author', 'media'])
             ->orderByDesc('published_at')
             ->paginate(12);
 
@@ -80,7 +80,7 @@ class BlogController
     public function feed(GeneralSettings $settings): Feed
     {
         $posts = Post::published()
-            ->with(['category', 'author'])
+            ->with(['category', 'author', 'media'])
             ->orderByDesc('published_at')
             ->limit(50)
             ->get();
@@ -106,12 +106,12 @@ class BlogController
     {
         abort_unless($request->user()?->can('manage blog'), 404);
 
-        return $this->render($post->load(['category', 'tags', 'author']), preview: true);
+        return $this->render($post->load(['category', 'tags', 'author', 'media']), preview: true);
     }
 
     public function show(Request $request, string $categoryOrSlug, ?string $slug = null): Response|RedirectResponse
     {
-        $query = Post::published()->with(['category', 'tags', 'author']);
+        $query = Post::published()->with(['category', 'tags', 'author', 'media']);
 
         $post = $slug !== null
             ? $query->whereRelation('category', 'slug', $categoryOrSlug)->where('slug', $slug)->first()
@@ -130,7 +130,7 @@ class BlogController
     private function render(Post $post, bool $preview = false): Response
     {
         $related = $post->relatedPosts()
-            ->with(['category', 'tags', 'author'])
+            ->with(['category', 'tags', 'author', 'media'])
             ->limit(3)
             ->get()
             ->map(fn (Post $p) => PostData::fromPost($p));

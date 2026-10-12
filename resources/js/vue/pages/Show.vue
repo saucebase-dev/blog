@@ -26,7 +26,7 @@ const props = defineProps<{
 // Inertia's Head renders text children but drops v-html. `<` is escaped so a
 // title containing a closing script tag cannot end the JSON-LD block.
 const toJsonLd = (data: object) =>
-    JSON.stringify(data).replaceAll('<', '\\u003c');
+    JSON.stringify(data).replaceAll('<', String.raw`\u003c`);
 
 const jsonLd = computed(() =>
     toJsonLd({

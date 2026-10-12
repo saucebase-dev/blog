@@ -4,7 +4,7 @@
 
 [![Tests](https://github.com/saucebase-dev/blog/actions/workflows/test.yml/badge.svg)](https://github.com/saucebase-dev/blog/actions/workflows/test.yml)
 [![Release](https://img.shields.io/github/v/release/saucebase-dev/blog)](https://github.com/saucebase-dev/blog/releases)
-[![Saucebase](https://img.shields.io/badge/Saucebase-1.1+-FF6B35)](https://github.com/saucebase-dev/saucebase)
+[![Saucebase Core](https://img.shields.io/badge/Saucebase_Core-1.6+-FF6B35)](https://github.com/saucebase-dev/core)
 [![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php&logoColor=white)](https://php.net)
 
 Works with:<br/>
@@ -37,7 +37,7 @@ Adds `/blog` with posts, categories, tags, cover images and an RSS feed. Write i
 
 | | |
 | --- | --- |
-| Saucebase core | `^1.1` |
+| Saucebase core | `^1.6` |
 | Modules | [Auth](https://github.com/saucebase-dev/auth) |
 | PHP packages | `spatie/laravel-feed` |
 

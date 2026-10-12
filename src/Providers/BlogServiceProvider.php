@@ -19,7 +19,7 @@ class BlogServiceProvider extends ModuleServiceProvider
             ->add(
                 fn (Sitemap $sitemap) => $sitemap
                     ->add(route('blog.index'))
-                    ->add(Post::published()->with('category')->get())
+                    ->add(Post::published()->with(['category', 'media'])->get())
                     ->add(Category::withPublishedPosts()->get())
                     ->add(Tag::withPublishedPosts()->get())
             );

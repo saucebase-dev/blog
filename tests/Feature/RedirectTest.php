@@ -44,6 +44,16 @@ class RedirectTest extends TestCase
         $this->get('/blog/news/hello')->assertStatus(301)->assertRedirect(route('blog.show.category', ['updates', 'hello']));
     }
 
+    public function test_deleting_a_category_redirects_the_urls_of_its_posts(): void
+    {
+        $category = Category::factory()->create(['slug' => 'news']);
+        Post::factory()->published()->create(['category_id' => $category->id, 'slug' => 'hello']);
+
+        $category->delete();
+
+        $this->get('/blog/news/hello')->assertStatus(301)->assertRedirect(route('blog.show', 'hello'));
+    }
+
     public function test_renaming_a_category_redirects_its_own_page(): void
     {
         $category = Category::factory()->create(['slug' => 'news']);

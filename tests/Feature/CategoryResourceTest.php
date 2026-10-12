@@ -2,7 +2,6 @@
 
 namespace Modules\Blog\Tests\Feature;
 
-use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -23,7 +22,7 @@ class CategoryResourceTest extends TestCase
         parent::setUp();
 
         $this->admin = User::factory()->create(['email_verified_at' => now()]);
-        $this->admin->assignRole(Role::ADMIN);
+        $this->admin->assignRole('admin');
     }
 
     public function test_admin_can_list_categories(): void
@@ -46,6 +45,16 @@ class CategoryResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('blog_categories', ['name' => 'Test Category']);
+    }
+
+    public function test_a_reserved_slug_is_rejected(): void
+    {
+        $this->actingAs($this->admin);
+
+        Livewire::test(CreateCategory::class)
+            ->fillForm(['name' => 'Tags', 'slug' => 'tag'])
+            ->call('create')
+            ->assertHasFormErrors(['slug']);
     }
 
     public function test_admin_can_edit_category(): void

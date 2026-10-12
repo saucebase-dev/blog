@@ -10,12 +10,19 @@
       "email": "hello@saucebase.dev"
     }
   ],
+  "require": {
+    "saucebase/core": "^1.6",
+    "spatie/laravel-feed": "^4.5"
+  },
   "extra": {
     "laravel": {
       "providers": [
         "Modules\\Blog\\Providers\\BlogServiceProvider"
       ],
       "aliases": {}
+    },
+    "saucebase": {
+      "frameworks": ["vue", "react"]
     }
   },
   "autoload": {

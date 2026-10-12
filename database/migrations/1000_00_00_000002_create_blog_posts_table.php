@@ -19,6 +19,9 @@ return new class extends Migration
             $table->foreignId('category_id')->nullable()->constrained('blog_categories')->nullOnDelete();
             $table->foreignId('author_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
+
+            $table->index('category_id');
+            $table->index('author_id');
         });
     }
 

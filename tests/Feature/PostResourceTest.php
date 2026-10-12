@@ -2,7 +2,6 @@
 
 namespace Modules\Blog\Tests\Feature;
 
-use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -10,7 +9,9 @@ use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Filament\Resources\Blog\Pages\CreatePost;
 use Modules\Blog\Filament\Resources\Blog\Pages\EditPost;
 use Modules\Blog\Filament\Resources\Blog\Pages\ListPosts;
+use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Models\Tag;
 use Tests\TestCase;
 
 class PostResourceTest extends TestCase
@@ -24,7 +25,7 @@ class PostResourceTest extends TestCase
         parent::setUp();
 
         $this->admin = User::factory()->create(['email_verified_at' => now()]);
-        $this->admin->assignRole(Role::ADMIN);
+        $this->admin->assignRole('admin');
     }
 
     public function test_admin_can_list_posts(): void
@@ -54,6 +55,49 @@ class PostResourceTest extends TestCase
             'title' => 'Test Post',
             'author_id' => $this->admin->id,
         ]);
+    }
+
+    public function test_admin_can_tag_a_post(): void
+    {
+        $post = Post::factory()->create();
+        $tags = Tag::factory(2)->create();
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(EditPost::class, ['record' => $post->id])
+            ->fillForm(['tags' => $tags->modelKeys()])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertEqualsCanonicalizing($tags->modelKeys(), $post->tags()->pluck('blog_tags.id')->all());
+    }
+
+    public function test_the_category_post_count_link_lists_only_that_categorys_posts(): void
+    {
+        $category = Category::factory()->create();
+        $inCategory = Post::factory()->create(['category_id' => $category->id]);
+        $elsewhere = Post::factory()->create(['category_id' => null]);
+
+        $this->actingAs($this->admin);
+
+        Livewire::withQueryParams(['filters' => ['category' => ['value' => $category->id]]])
+            ->test(ListPosts::class)
+            ->assertCanSeeTableRecords([$inCategory])
+            ->assertCanNotSeeTableRecords([$elsewhere]);
+    }
+
+    public function test_the_tag_post_count_link_lists_only_that_tags_posts(): void
+    {
+        $tag = Tag::factory()->create();
+        $tagged = Post::factory()->hasAttached($tag)->create();
+        $untagged = Post::factory()->create();
+
+        $this->actingAs($this->admin);
+
+        Livewire::withQueryParams(['filters' => ['tags' => ['values' => [$tag->id]]]])
+            ->test(ListPosts::class)
+            ->assertCanSeeTableRecords([$tagged])
+            ->assertCanNotSeeTableRecords([$untagged]);
     }
 
     public function test_admin_can_edit_post(): void

@@ -7,12 +7,20 @@ use Illuminate\Database\Seeder;
 use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
+use Modules\Blog\Models\Tag;
+use Spatie\Permission\Models\Role;
 
-class BlogDatabaseSeeder extends Seeder
+class DemoBlogDatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        $author = User::first();
+        // A staff account that sees only the blog admin, and writes the demo posts.
+        Role::findOrCreate('blog admin')->syncPermissions(['access admin panel', 'manage blog']);
+        $author = User::firstOrCreate(
+            ['email' => 'blog@saucebase.dev'],
+            ['name' => 'Blog Admin', 'password' => bcrypt('secretsauce')],
+        );
+        $author->syncRoles('blog admin');
 
         $gettingStarted = Category::firstOrCreate(['name' => 'Getting Started']);
         $featuresModules = Category::firstOrCreate(['name' => 'Features & Modules']);
@@ -28,8 +36,8 @@ class BlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subMonths(5),
             'category_id' => $gettingStarted->id,
-            'author_id' => $author?->id,
-        ], $image('what-is-saucebase.jpg'));
+            'author_id' => $author->id,
+        ], $image('what-is-saucebase.jpg'), ['Laravel', 'SaaS']);
 
         $this->createPost([
             'title' => 'Stop Rebuilding the Same Boilerplate Every Project',
@@ -38,8 +46,8 @@ class BlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subMonths(4),
             'category_id' => $gettingStarted->id,
-            'author_id' => $author?->id,
-        ]);
+            'author_id' => $author->id,
+        ], tags: ['Laravel', 'Productivity']);
 
         $this->createPost([
             'title' => 'The Modern Laravel Stack: Inertia.js, Vue 3 or React, and Tailwind Done Right',
@@ -48,8 +56,8 @@ class BlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subMonths(3),
             'category_id' => $devExperience->id,
-            'author_id' => $author?->id,
-        ], $image('tech-stack.jpg'));
+            'author_id' => $author->id,
+        ], $image('tech-stack.jpg'), ['Laravel', 'Inertia', 'Vue', 'React', 'Tailwind']);
 
         $this->createPost([
             'title' => 'Your First Module: Scaffold and Ship in Under 10 Minutes',
@@ -58,8 +66,8 @@ class BlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subMonths(2),
             'category_id' => $featuresModules->id,
-            'author_id' => $author?->id,
-        ], $image('add-your-saucebase.jpg'));
+            'author_id' => $author->id,
+        ], $image('add-your-saucebase.jpg'), ['Modules', 'Tutorial']);
 
         $this->createPost([
             'title' => 'Auth, Billing, and Privacy: The Three Modules Every SaaS Needs',
@@ -68,8 +76,8 @@ class BlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subMonth(),
             'category_id' => $featuresModules->id,
-            'author_id' => $author?->id,
-        ], $image('cookies-or-privacy.jpg'));
+            'author_id' => $author->id,
+        ], $image('cookies-or-privacy.jpg'), ['Modules', 'SaaS', 'Stripe']);
 
         $this->createPost([
             'title' => 'Copy-and-Own: The Philosophy Behind Saucebase Modules',
@@ -78,8 +86,8 @@ class BlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subWeeks(2),
             'category_id' => $devExperience->id,
-            'author_id' => $author?->id,
-        ], $image('your-recipes.jpg'));
+            'author_id' => $author->id,
+        ], $image('your-recipes.jpg'), ['Modules']);
 
         $this->createPost([
             'title' => 'Vue or React? What about both!',
@@ -88,13 +96,21 @@ class BlogDatabaseSeeder extends Seeder
             'status' => PostStatus::Published,
             'published_at' => now()->subDays(3),
             'category_id' => $devExperience->id,
-            'author_id' => $author?->id,
-        ], $image('vue-and-react.jpg'));
+            'author_id' => $author->id,
+        ], $image('vue-and-react.jpg'), ['Vue', 'React', 'Inertia']);
     }
 
-    private function createPost(array $data, string $coverImage = ''): Post
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  list<string>  $tags
+     */
+    private function createPost(array $data, string $coverImage = '', array $tags = []): Post
     {
         $post = Post::firstOrCreate(['title' => $data['title']], $data);
+
+        $post->tags()->syncWithoutDetaching(
+            collect($tags)->map(fn (string $name) => Tag::firstOrCreate(['name' => $name])->id)
+        );
 
         if ($coverImage && file_exists($coverImage)) {
             $post->addMedia($coverImage)->preservingOriginal()->toMediaCollection('cover', 'public');

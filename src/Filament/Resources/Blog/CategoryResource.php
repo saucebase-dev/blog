@@ -22,6 +22,11 @@ class CategoryResource extends Resource
 
     protected static bool $shouldRegisterNavigation = false;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->can('manage blog') ?? false;
+    }
+
     public static function form(Schema $schema): Schema
     {
         return CategoryForm::configure($schema);
@@ -30,11 +35,6 @@ class CategoryResource extends Resource
     public static function table(Table $table): Table
     {
         return CategoriesTable::configure($table);
-    }
-
-    public static function getRelations(): array
-    {
-        return [];
     }
 
     public static function getPages(): array

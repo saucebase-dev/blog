@@ -3,11 +3,16 @@
 namespace Modules\Blog\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
 
 class DatabaseSeeder extends Seeder
 {
+    /**
+     * The blog admin area's permission, granted to nobody: the app's roles seeder decides
+     * who gets it, and `admin` passes every check anyway.
+     */
     public function run(): void
     {
-        $this->call(BlogDatabaseSeeder::class);
+        Permission::findOrCreate('manage blog');
     }
 }

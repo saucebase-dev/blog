@@ -4,12 +4,12 @@ namespace Modules\Blog\Filament\Resources\Blog\Tables;
 
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Modules\Blog\Enums\PostStatus;
-use Modules\Blog\Models\Post;
+use Modules\Blog\Filament\Resources\Blog\PostResource;
 
 class PostsTable
 {
@@ -17,6 +17,13 @@ class PostsTable
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('cover')
+                    ->label('')
+                    ->collection('cover')
+                    ->conversion('card')
+                    ->imageHeight(40)
+                    ->extraImgAttributes(['class' => 'aspect-video rounded object-cover']),
+
                 TextColumn::make('title')
                     ->searchable()
                     ->limit(50),
@@ -24,6 +31,11 @@ class PostsTable
                 TextColumn::make('category.name')
                     ->placeholder(__('—'))
                     ->sortable(),
+
+                TextColumn::make('tags.name')
+                    ->badge()
+                    ->placeholder(__('—'))
+                    ->toggleable(),
 
                 TextColumn::make('status')
                     ->badge()
@@ -46,20 +58,21 @@ class PostsTable
             ->filters([
                 SelectFilter::make('status')
                     ->options(PostStatus::class),
+                SelectFilter::make('category')
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload(),
+                SelectFilter::make('tags')
+                    ->relationship('tags', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
             ])
-            ->actions([
-                ViewAction::make('view_post')
-                    ->label(__('View Post'))
-                    ->icon('heroicon-o-arrow-top-right-on-square')
-                    ->color('gray')
-                    ->url(fn (Post $record): string => $record->category
-                        ? route('blog.show.category', [$record->category->slug, $record->slug])
-                        : route('blog.show', $record->slug)
-                    )
-                    ->openUrlInNewTab(),
+            ->recordActions([
+                PostResource::viewPostAction(),
                 EditAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 DeleteBulkAction::make(),
             ])
             ->defaultSort('created_at', 'desc');

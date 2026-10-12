@@ -6,6 +6,8 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Modules\Blog\Filament\Resources\Blog\PostResource;
+use Modules\Blog\Models\Category;
 
 class CategoriesTable
 {
@@ -23,17 +25,20 @@ class CategoriesTable
                 TextColumn::make('posts_count')
                     ->label(__('Posts'))
                     ->counts('posts')
-                    ->sortable(),
+                    ->sortable()
+                    ->url(fn (Category $record): string => PostResource::getUrl('index', [
+                        'filters' => ['category' => ['value' => $record->id]],
+                    ])),
 
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->actions([
+            ->recordActions([
                 EditAction::make(),
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 DeleteBulkAction::make(),
             ]);
     }

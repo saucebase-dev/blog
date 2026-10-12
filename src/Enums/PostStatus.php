@@ -4,9 +4,7 @@ namespace Modules\Blog\Enums;
 
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
-use Spatie\TypeScriptTransformer\Attributes\TypeScript;
 
-#[TypeScript]
 enum PostStatus: string implements HasColor, HasLabel
 {
     case Draft = 'draft';
@@ -20,7 +18,7 @@ enum PostStatus: string implements HasColor, HasLabel
         };
     }
 
-    public function getColor(): string|array|null
+    public function getColor(): string
     {
         return match ($this) {
             self::Draft => 'warning',

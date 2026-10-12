@@ -42,6 +42,8 @@ const canonical = computed(() =>
         :canonical="canonical"
     >
         <Head>
+            <!-- The layout sets the same title; repeated so this head has one of its own. -->
+            <title>{{ title }}</title>
             <link
                 rel="alternate"
                 type="application/rss+xml"

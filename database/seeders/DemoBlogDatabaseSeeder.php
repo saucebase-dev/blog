@@ -18,7 +18,7 @@ class DemoBlogDatabaseSeeder extends Seeder
         Role::findOrCreate('blog admin')->syncPermissions(['access admin panel', 'manage blog']);
         $author = User::firstOrCreate(
             ['email' => 'blog@saucebase.dev'],
-            ['name' => 'Blog Admin', 'password' => bcrypt('secretsauce')],
+            ['name' => 'Blog Admin', 'password' => bcrypt(config('saucebase.demo_password'))],
         );
         $author->syncRoles('blog admin');
 

@@ -1,91 +1,62 @@
-# Blog Module
+# Saucebase Blog
 
 <div align="center">
 
 [![Tests](https://github.com/saucebase-dev/blog/actions/workflows/test.yml/badge.svg)](https://github.com/saucebase-dev/blog/actions/workflows/test.yml)
 [![Release](https://img.shields.io/github/v/release/saucebase-dev/blog)](https://github.com/saucebase-dev/blog/releases)
-[![Saucebase Core](https://img.shields.io/badge/Saucebase_Core-1.6+-FF6B35)](https://github.com/saucebase-dev/core)
-[![PHP](https://img.shields.io/badge/PHP-8.4+-777BB4?logo=php&logoColor=white)](https://php.net)
-
-Works with:<br/>
-[![Vue 3.5](https://img.shields.io/badge/Vue-3.5-4FC08D?logo=vue.js&logoColor=white)](https://vuejs.org) [![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)](https://react.dev)
+[![Saucebase Core](https://img.shields.io/packagist/dependency-v/saucebase/blog/saucebase%2Fcore?label=Saucebase%20Core&color=FF6B35)](https://github.com/saucebase-dev/core)
+[![License](https://img.shields.io/github/license/saucebase-dev/blog)](LICENSE)
 
 </div>
 
-A blog for [Saucebase](https://github.com/saucebase-dev/saucebase), a Laravel SaaS starter kit.
+A blog for Saucebase: posts, categories, tags, RSS and SEO, managed from the admin.
 
-Adds `/blog` with posts, categories, tags, cover images and an RSS feed. Write in the admin, schedule for later, and the pages are server-rendered so search engines can read them.
-
-**[Full documentation →](https://saucebase-dev.github.io/docs/modules/blog)**
+A module for [Saucebase](https://github.com/saucebase-dev/saucebase), the AI-ready Laravel SaaS kit. Modules are Composer packages you add to a Saucebase app; once installed, the code is yours to change.
 
 ## Features
 
-- **Posts** — rich text editor, cover image, excerpt and author
-- **Categories** — one per post, with the category in the URL and its own page
-- **Tags** — as many per post as you like, each with its own page
-- **Browse by topic** — a category menu on every listing page
-- **Scheduling** — set a publish date and the post goes live on its own
-- **Draft preview** — see a post on its real page before you publish it
-- **Old links keep working** — change a slug or move a post to another category, and the old URL redirects to the new one
-- **Built for search** — server-rendered pages, meta tags, breadcrumbs, and structured data
-- **RSS feed** — at `/blog/feed`
-- **Safe by default** — post HTML is cleaned before it reaches the page
-- **Admin panel** — manage posts, categories and tags at `/admin`
-- **Vue and React** — works on both
+- **Posts** with a rich text editor, cover image, excerpt and author
+- **Categories and tags**, each with its own page
+- **Scheduling**: posts go live on their publish date
+- **Draft preview** on the real page before publishing
+- **Old links keep working**: changed slugs redirect to the new URL
+- **Built for search**: server-rendered pages, meta tags, breadcrumbs and structured data
+- **RSS feed** at `/blog/feed`
+- **Safe by default**: post HTML is cleaned before it reaches the page
+- **Admin panel** for posts, categories and tags
+- **Vue and React**
 
-## Requirements
+## Install
 
-| | |
-| --- | --- |
-| Saucebase core | `^1.6` |
-| Modules | [Auth](https://github.com/saucebase-dev/auth) |
-| PHP packages | `spatie/laravel-feed` |
+**New to Saucebase?** Start a new app and pick **blog** when it asks for modules:
 
-## Installation
+```bash
+curl -fsSL https://install.saucebase.dev | bash
+```
+
+It installs PHP and Composer if they're missing. With the CLI already installed, run `saucebase new my-app` instead.
+
+**Already have a Saucebase app?** Add it with:
 
 ```bash
 composer require saucebase/blog
 php artisan migrate
+php artisan modules:seed --module=blog
 npm run build
 ```
 
-Then go to `/admin` → Blog and write your first post. There is nothing to configure.
+## Configuration
 
-### Sample data (optional)
+Nothing to set up. Everything is in the admin panel, under **Blog**.
+
+## Demo data
 
 ```bash
 php artisan modules:seed --module=blog --demo
 ```
 
-Adds sample posts and categories so you can see the layout before writing anything.
-
-## Writing a post
-
-In `/admin` → Blog → Posts:
-
-- **Status** — Draft or Published
-- **Published at** — leave it empty to go live now, or set a future date to schedule it
-
-A post is only live when it is Published *and* its date has passed.
-
-Posts are reachable two ways: `/blog/my-post` and `/blog/my-category/my-post`. If the post has a category, the second one is the canonical URL — that is what search engines are told to use.
-
-Each category has a page at `/blog/category/my-category`, and each tag at `/blog/tag/my-tag`. A post has one category, which decides its URL, and as many tags as you like, which don't.
-
-Four words are reserved and can't be used as slugs: `category`, `tag` and `preview` for categories, `feed` for posts.
-
-## Extending
-
-**Change the pages.** The index and post pages are normal Vue and React pages in `resources/js/`. Edit them like any other.
-
-**Add a field.** Add it to a migration and the model, then to `PostData` — that is the one place the frontend gets its data from. Regenerate the types afterwards.
-
-## Configuration
-
-Nothing to set up. Everything is in the admin.
-
-See the [documentation](https://saucebase-dev.github.io/docs/modules/blog) for customising the feed, the layout and the metadata.
+Adds sample posts, categories and tags, and a staff account (`blog@saucebase.dev`) that only sees the blog in the admin. It uses the `DEMO_PASSWORD` from `.env`.
 
 ## License
 
-Proprietary. Part of [Saucebase](https://github.com/saucebase-dev/saucebase).
+MIT. See [LICENSE](LICENSE).

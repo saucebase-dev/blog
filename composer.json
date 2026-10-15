@@ -1,6 +1,6 @@
 {
   "name": "saucebase/blog",
-  "description": "Blog module",
+  "description": "A blog for Saucebase: posts, categories, tags, RSS and SEO, managed from the admin.",
   "type": "saucebase-module",
   "license": "MIT",
   "version": "v3.1.1",
@@ -11,7 +11,7 @@
     }
   ],
   "require": {
-    "saucebase/core": "^1.6",
+    "saucebase/core": "^1.13",
     "spatie/laravel-feed": "^4.5"
   },
   "extra": {

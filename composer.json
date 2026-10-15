@@ -3,7 +3,7 @@
   "description": "Blog module",
   "type": "saucebase-module",
   "license": "MIT",
-  "version": "v3.1.0",
+  "version": "v3.1.1",
   "authors": [
     {
       "name": "Saucebase",

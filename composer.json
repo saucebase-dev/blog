@@ -3,7 +3,7 @@
   "description": "A blog for Saucebase: posts, categories, tags, RSS and SEO, managed from the admin.",
   "type": "saucebase-module",
   "license": "MIT",
-  "version": "v3.1.1",
+  "version": "v3.2.0",
   "authors": [
     {
       "name": "Saucebase",

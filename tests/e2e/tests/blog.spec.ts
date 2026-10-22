@@ -76,7 +76,10 @@ test.describe('Blog public pages', () => {
         const postUrl = `/blog/${category.slug}/${post.slug}`;
 
         await page.goto(postUrl);
-        await page.getByTestId('post-category-link').click();
+        await page
+            .getByTestId('post-filed-under')
+            .getByTestId('post-category-link')
+            .click();
         await expect(
             page.getByTestId(`category-nav-${category.slug}`),
         ).toHaveAttribute('aria-current', 'page');

@@ -4,6 +4,7 @@ namespace Modules\Blog\Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Filament\Resources\Blog\Pages\CreatePost;
@@ -112,6 +113,27 @@ class PostResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('blog_posts', ['id' => $post->id, 'title' => 'Updated Title']);
+    }
+
+    /**
+     * The editor gets what is stored, not the sanitised read: the sanitiser cuts input at
+     * 500,000 bytes, and saving any other field would write the cut copy back.
+     */
+    public function test_saving_another_field_keeps_long_content_whole(): void
+    {
+        $content = str_repeat('<p>Long post.</p>', 40_000);
+        $post = Post::factory()->create(['author_id' => $this->admin->id, 'content' => $content]);
+        $this->assertGreaterThan(500_000, strlen($content));
+
+        $this->actingAs($this->admin);
+
+        Livewire::test(EditPost::class, ['record' => $post->id])
+            ->fillForm(['title' => 'Renamed'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $stored = (string) DB::table('blog_posts')->where('id', $post->id)->value('content');
+        $this->assertSame(strlen($content), strlen($stored), 'the stored content was cut');
     }
 
     public function test_admin_can_delete_post(): void

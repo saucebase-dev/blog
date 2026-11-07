@@ -5,7 +5,6 @@ namespace Modules\Blog\Http\Controllers;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Modules\Blog\Data\CategoryData;
@@ -136,7 +135,7 @@ class BlogController
             ->map(fn (Post $p) => PostData::fromPost($p));
 
         return Inertia::render('Blog::Show', [
-            'post' => PostData::fromPost($post, content: Str::sanitizeHtml($post->content)),
+            'post' => PostData::fromPost($post, content: $post->content),
             'related' => $related,
             'preview' => $preview,
         ])->withSSR();

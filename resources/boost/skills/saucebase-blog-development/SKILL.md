@@ -68,7 +68,7 @@ The card's title link stretches over the whole card (`after:absolute after:inset
 
 ### Post Content Is Sanitized on Output
 
-The rich-editor HTML is rendered with `v-html` / `dangerouslySetInnerHTML`. `BlogController::show()` passes it through `Str::sanitizeHtml()` (Filament's Symfony sanitizer) first, so scripts and event handlers never reach the page. Keep that call if the controller changes.
+The rich-editor HTML is rendered with `v-html` / `dangerouslySetInnerHTML`. `Post::content` is cast with core's `SanitizedHtml`, which runs `Str::sanitizeHtml()` (Filament's Symfony sanitizer) on every read and stores what was written, so scripts and event handlers never reach a page, whichever endpoint sends it. Keep the cast (sc-1131).
 
 The JSON-LD `<script>` escapes `<` as `<` so a title containing `</script>` cannot break out of it.
 

@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Modules\Blog\Contracts\Redirectable;
 use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Traits\HasRedirects;
+use Saucebase\Core\Casts\SanitizedHtml;
 use Spatie\Feed\Feedable;
 use Spatie\Feed\FeedItem;
 use Spatie\MediaLibrary\HasMedia;
@@ -73,6 +74,8 @@ class Post extends Model implements Feedable, HasMedia, Redirectable, Sitemapabl
         return [
             'status' => PostStatus::class,
             'published_at' => 'datetime',
+            // Rendered as markup on the post page; sanitised on every read.
+            'content' => SanitizedHtml::class,
         ];
     }
 

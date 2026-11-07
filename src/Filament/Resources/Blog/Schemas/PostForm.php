@@ -39,6 +39,9 @@ class PostForm
 
                     RichEditor::make('content')
                         ->hiddenLabel()
+                        // What is stored, not the sanitised read: the sanitiser cuts input
+                        // at 500,000 bytes, and saving any field would write the cut copy back.
+                        ->formatStateUsing(fn (?Post $record, mixed $state): mixed => $record?->getRawOriginal('content') ?? $state)
                         ->required(),
 
                     Section::make(__('Excerpt'))

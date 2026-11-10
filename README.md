@@ -115,7 +115,7 @@ Run `npm run build` afterwards.
 ## Demo data
 
 ```bash
-php artisan modules:seed --module=blog --demo
+php artisan modules:seed --module=blog --state=showcase
 ```
 
 Adds sample posts, categories and tags, and a staff account (`blog@saucebase.dev`) that only sees the blog in the admin. It uses the `DEMO_PASSWORD` from `.env`.

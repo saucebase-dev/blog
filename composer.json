@@ -26,6 +26,9 @@
         "vue",
         "react"
       ]
+    },
+    "branch-alias": {
+      "dev-dev": "3.4.x-dev"
     }
   },
   "autoload": {

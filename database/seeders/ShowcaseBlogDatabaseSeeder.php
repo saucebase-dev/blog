@@ -10,7 +10,7 @@ use Modules\Blog\Models\Post;
 use Modules\Blog\Models\Tag;
 use Spatie\Permission\Models\Role;
 
-class DemoBlogDatabaseSeeder extends Seeder
+class ShowcaseBlogDatabaseSeeder extends Seeder
 {
     public function run(): void
     {

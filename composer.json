@@ -11,7 +11,7 @@
     }
   ],
   "require": {
-    "saucebase/core": "^2.12.0",
+    "saucebase/core": "^3.0",
     "spatie/laravel-feed": "^4.5"
   },
   "extra": {
@@ -26,6 +26,9 @@
         "vue",
         "react"
       ]
+    },
+    "branch-alias": {
+      "dev-dev": "3.4.x-dev"
     }
   },
   "autoload": {

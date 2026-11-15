@@ -118,7 +118,7 @@ Run `npm run build` afterwards.
 php artisan modules:seed --module=blog --state=showcase
 ```
 
-Adds sample posts, categories and tags, and a staff account (`blog@saucebase.dev`) that only sees the blog in the admin. It uses the `DEMO_PASSWORD` from `.env`.
+Adds sample posts, categories and tags, and a staff account (`blog@saucebase.dev`) that only sees the blog in the admin. It uses the `DEMO_PASSWORD` from `.env`; when that is empty, a random one is generated, saved there and printed.
 
 ## License
 

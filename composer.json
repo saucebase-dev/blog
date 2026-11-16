@@ -28,7 +28,7 @@
       ]
     },
     "branch-alias": {
-      "dev-dev": "3.4.x-dev"
+      "dev-dev": "3.x-dev"
     }
   },
   "autoload": {

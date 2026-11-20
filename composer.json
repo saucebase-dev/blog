@@ -11,7 +11,7 @@
     }
   ],
   "require": {
-    "saucebase/core": "^3.0",
+    "saucebase/core": "^3.1",
     "spatie/laravel-feed": "^4.5"
   },
   "extra": {

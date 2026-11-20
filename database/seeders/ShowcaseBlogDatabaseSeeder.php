@@ -8,8 +8,10 @@ use Modules\Blog\Enums\PostStatus;
 use Modules\Blog\Models\Category;
 use Modules\Blog\Models\Post;
 use Modules\Blog\Models\Tag;
+use Saucebase\Core\Attributes\DemoAccount;
 use Spatie\Permission\Models\Role;
 
+#[DemoAccount('blog@saucebase.dev', 'staff: the blog admin, author of the demo posts')]
 class ShowcaseBlogDatabaseSeeder extends Seeder
 {
     public function run(): void
